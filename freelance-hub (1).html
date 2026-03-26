@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freelance Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f0f;
+  --bg2: #181818;
+  --bg3: #222222;
+  --bg4: #2a2a2a;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f0f0;
+  --text2: #888;
+  --text3: #555;
+  --accent: #c8f55a;
+  --accent-dim: rgba(200,245,90,0.12);
+  --accent-text: #1a2a00;
+  --red: #ff5c5c;
+  --red-dim: rgba(255,92,92,0.1);
+  --yellow: #ffd166;
+  --yellow-dim: rgba(255,209,102,0.1);
+  --blue: #5c9eff;
+  --blue-dim: rgba(92,158,255,0.1);
+  --green: #5cffa0;
+  --green-dim: rgba(92,255,160,0.1);
+  --radius: 10px;
+  --radius-sm: 6px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+
+/* LAYOUT */
+.shell { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; min-width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; position: sticky; top: 0; height: 100vh; }
+.main { flex: 1; overflow: auto; }
+
+/* SIDEBAR */
+.logo { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); }
+.logo-mark { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; color: var(--text); }
+.logo-mark span { color: var(--accent); }
+.logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
+.nav { padding: 16px 12px; flex: 1; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text2); font-size: 13px; font-weight: 400; transition: all .15s; border: none; background: none; width: 100%; text-align: left; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 500; }
+.nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+.nav-section { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; padding: 16px 10px 6px; font-family: 'DM Mono', monospace; }
+.sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+.summary-mini { display: flex; flex-direction: column; gap: 6px; }
+.summary-mini-row { display: flex; justify-content: space-between; align-items: center; }
+.summary-mini-label { font-size: 11px; color: var(--text3); }
+.summary-mini-val { font-size: 12px; font-family: 'DM Mono', monospace; font-weight: 500; }
+.summary-mini-val.green { color: var(--green); }
+.summary-mini-val.red { color: var(--red); }
+
+/* MAIN CONTENT */
+.page { display: none; padding: 32px 36px; }
+.page.active { display: block; }
+.page-header { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+.page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+.page-sub { font-size: 13px; color: var(--text2); margin-top: 3px; }
+
+/* CARDS */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+.stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+.stat-val { font-size: 24px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -1px; }
+.stat-val.accent { color: var(--accent); }
+.stat-val.green { color: var(--green); }
+.stat-val.red { color: var(--red); }
+.stat-val.blue { color: var(--blue); }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 400; transition: all .15s; }
+.btn:hover { background: var(--bg4); border-color: var(--border2); }
+.btn-accent { background: var(--accent); color: var(--accent-text); border-color: transparent; font-weight: 600; }
+.btn-accent:hover { background: #d4f870; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text2); }
+.btn-ghost:hover { background: var(--bg3); color: var(--text); }
+.btn-danger { background: transparent; border-color: transparent; color: var(--red); }
+.btn-danger:hover { background: var(--red-dim); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn svg { width: 14px; height: 14px; }
+
+/* FORM ELEMENTS */
+input, select, textarea { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; width: 100%; transition: border .15s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--border2); }
+select option { background: var(--bg3); }
+textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em; font-family: 'DM Mono', monospace; }
+.form-group { margin-bottom: 14px; }
+.form-row { display: grid; gap: 12px; }
+.form-row-2 { grid-template-columns: 1fr 1fr; }
+.form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+/* TABLE */
+.table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; background: var(--bg2); }
+td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+.group-row { cursor: pointer; transition: background .12s; }
+.group-row:hover td { background: rgba(255,255,255,0.02); }
+.detail-row td { background: var(--bg); padding: 0; }
+.detail-inner { padding: 8px 16px 16px 40px; }
+.sub-table { width: 100%; border-collapse: collapse; }
+.sub-table td { padding: 7px 10px; font-size: 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.sub-table tr:last-child td { border-bottom: none; }
+.sub-table th { font-size: 10px; padding: 5px 10px; background: transparent; border-bottom: 1px solid var(--border); }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge::before { content:''; width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+.badge-green { background: var(--green-dim); color: var(--green); } .badge-green::before { background: var(--green); }
+.badge-yellow { background: var(--yellow-dim); color: var(--yellow); } .badge-yellow::before { background: var(--yellow); }
+.badge-red { background: var(--red-dim); color: var(--red); } .badge-red::before { background: var(--red); }
+.badge-blue { background: var(--blue-dim); color: var(--blue); } .badge-blue::before { background: var(--blue); }
+.badge-accent { background: var(--accent-dim); color: var(--accent); } .badge-accent::before { background: var(--accent); }
+.badge-gray { background: rgba(255,255,255,0.06); color: var(--text2); } .badge-gray::before { background: var(--text3); }
+
+/* CHIP (cliente) */
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 5px; border-radius: 20px; font-size: 11px; background: var(--bg4); border: 1px solid var(--border); }
+.chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* EXPAND TOGGLE */
+.expand-btn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 4px; transition: transform .18s, background .12s; background: var(--bg4); }
+.expand-btn.open { transform: rotate(90deg); }
+.expand-btn svg { width: 10px; height: 10px; color: var(--text3); }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); display: flex; align-items: center; justify-content: center; z-index: 200; backdrop-filter: blur(3px); }
+.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; padding: 28px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+.modal-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+
+/* KANBAN */
+.kanban-wrap { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; align-items: flex-start; }
+.kanban-col { min-width: 270px; width: 270px; flex-shrink: 0; }
+.kanban-col-head { display: flex; align-items: center; justify-content: space-between; padding: 0 2px 12px; }
+.kanban-col-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text2); font-family: 'DM Mono', monospace; }
+.kanban-col-count { background: var(--bg3); border: 1px solid var(--border); color: var(--text3); width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 11px; }
+.kanban-col-dot { width: 8px; height: 8px; border-radius: 50%; }
+.kanban-cards { display: flex; flex-direction: column; gap: 10px; min-height: 80px; }
+.kanban-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 15px; cursor: pointer; transition: border-color .15s, transform .12s; position: relative; overflow: hidden; }
+.kanban-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.kanban-card.urgente::before { background: var(--red); }
+.kanban-card.normal::before { background: var(--yellow); }
+.kanban-card.baixa::before { background: var(--text3); }
+.kanban-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.kanban-card-title { font-size: 13px; font-weight: 500; margin-bottom: 8px; line-height: 1.4; }
+.kanban-card-desc { font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kanban-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.kanban-card-date { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 4px; }
+.kanban-card-date.late { color: var(--red); }
+.kanban-card-date.soon { color: var(--yellow); }
+.kanban-card-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .12s; }
+.kanban-card:hover .kanban-card-actions { opacity: 1; }
+.kanban-move-btn { background: var(--bg4); border: 1px solid var(--border); color: var(--text2); padding: 3px 7px; border-radius: 4px; font-size: 10px; cursor: pointer; transition: all .12s; }
+.kanban-move-btn:hover { border-color: var(--accent); color: var(--accent); }
+.add-card-btn { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: var(--radius-sm); color: var(--text3); font-size: 12px; cursor: pointer; transition: all .15s; background: transparent; border: 1px dashed var(--border); width: 100%; margin-top: 6px; }
+.add-card-btn:hover { border-color: var(--border2); color: var(--text2); background: var(--bg3); }
+
+/* LINKED BADGE */
+.linked-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; background: var(--accent-dim); border: 1px solid rgba(200,245,90,.2); border-radius: 4px; font-size: 10px; color: var(--accent); font-family: 'DM Mono', monospace; cursor: pointer; }
+.linked-badge:hover { background: rgba(200,245,90,.2); }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* SECTION BOX */
+.section-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.section-box-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.section-box-title { font-size: 13px; font-weight: 500; }
+.section-box-body { padding: 20px; }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 13px; }
+.empty-state svg { width: 32px; height: 32px; margin-bottom: 10px; opacity: .3; }
+
+/* COLOR PICKER */
+input[type=color] { width: 40px; height: 36px; padding: 3px; cursor: pointer; border-radius: var(--radius-sm); }
+
+/* TABS */
+.tabs-bar { display: flex; gap: 2px; padding: 4px; background: var(--bg3); border-radius: var(--radius-sm); width: fit-content; margin-bottom: 24px; }
+.tab-btn { padding: 6px 14px; border-radius: 5px; font-size: 12px; cursor: pointer; border: none; background: transparent; color: var(--text2); transition: all .15s; font-family: 'DM Sans', sans-serif; }
+.tab-btn.active { background: var(--bg); color: var(--text); font-weight: 500; }
+
+/* Notification dot */
+.notif { width: 6px; height: 6px; background: var(--red); border-radius: 50%; display: inline-block; margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">Freelance<span>Hub</span></div>
+      <div class="logo-sub">v2.0 — sistema integrado</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Visão Geral</div>
+      <button class="nav-item active" onclick="goPage('dashboard',this)">
+        <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <div class="nav-section">Trabalho</div>
+      <button class="nav-item" onclick="goPage('kanban',this)">
+        <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="4" height="14" rx="1.5"/><rect x="6" y="1" width="4" height="9" rx="1.5"/><rect x="11" y="1" width="4" height="11" rx="1.5"/></svg>
+        Demandas
+        <span id="nav-late-dot" style="display:none" class="notif"></span>
+      </button>
+      <div class="nav-section">Financeiro</div>
+      <button class="nav-item" onclick="goPage('financeiro',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v14M4 4h5.5a2.5 2.5 0 010 5H4m0 0h5a2.5 2.5 0 010 5H4"/></svg>
+        Lançamentos
+      </button>
+      <button class="nav-item" onclick="goPage('clientes',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-5 5-5s5 2 5 5"/><path d="M11 7c1.5 0 4 .8 4 4"/><circle cx="11" cy="4" r="2"/></svg>
+        Clientes
+      </button>
+      <button class="nav-item" onclick="goPage('servicos',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M5 7h6M5 10h4"/></svg>
+        Serviços
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="summary-mini" id="sidebar-summary"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Visão geral do seu trabalho</div>
+        </div>
+      </div>
+      <div class="stat-grid" id="dash-stats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="section-box">
+          <div class="section-box-head">
+            <span class="section-box-title">Demandas em aberto</span>
+            <button class="btn btn-ghost btn-sm" onclick="goPage('kanban',document.querySelector('.nav-item:nth-child(4)'))">Ver tudo →</button>
+          </div>
+          <div id="dash-demands"></div>
+        </div>
+        <div class="section-box">
+          <div class="section-box-head">
+            <span class="section-box-title">A receber por cliente</span>
+            <button class="btn btn-ghost btn-sm" onclick="goPage('financeiro',document.querySelector('.nav-item:nth-child(7)'))">Ver tudo →</button>
+          </div>
+          <div id="dash-receivables"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KANBAN -->
+    <div class="page" id="page-kanban">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Demandas</div>
+          <div class="page-sub">Organize e acompanhe suas entregas</div>
+        </div>
+        <button class="btn btn-accent" onclick="openDemandModal()">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a1 1 0 011 1v5h5a1 1 0 110 2H9v5a1 1 0 11-2 0V9H2a1 1 0 110-2h5V2a1 1 0 011-1z"/></svg>
+          Nova Demanda
+        </button>
+      </div>
+      <div class="kanban-wrap" id="kanban-board"></div>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div class="page" id="page-financeiro">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Lançamentos</div>
+          <div class="page-sub">Registre serviços e controle pagamentos</div>
+        </div>
+        <button class="btn btn-accent" onclick="openEntryModal()">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a1 1 0 011 1v5h5a1 1 0 110 2H9v5a1 1 0 11-2 0V9H2a1 1 0 110-2h5V2a1 1 0 011-1z"/></svg>
+          Novo Lançamento
+        </button>
+      </div>
+      <div class="stat-grid" id="fin-stats"></div>
+      <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
+        <select id="filter-client" onchange="renderEntries()" style="width:180px">
+          <option value="">Todos clientes</option>
+        </select>
+        <select id="filter-status" onchange="renderEntries()" style="width:150px">
+          <option value="">Todos status</option>
+          <option value="pendente">Pendente</option>
+          <option value="recebido">Recebido</option>
+        </select>
+      </div>
+      <div id="entries-table"></div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="page" id="page-clientes">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Clientes</div>
+          <div class="page-sub">Gerencie clientes e preços personalizados</div>
+        </div>
+        <button class="btn btn-accent" onclick="openClientModal()">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a1 1 0 011 1v5h5a1 1 0 110 2H9v5a1 1 0 11-2 0V9H2a1 1 0 110-2h5V2a1 1 0 011-1z"/></svg>
+          Novo Cliente
+        </button>
+      </div>
+      <div id="clients-list"></div>
+    </div>
+
+    <!-- SERVIÇOS -->
+    <div class="page" id="page-servicos">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Serviços</div>
+          <div class="page-sub">Tipos de serviço e preços padrão</div>
+        </div>
+        <button class="btn btn-accent" onclick="openServiceModal()">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a1 1 0 011 1v5h5a1 1 0 110 2H9v5a1 1 0 11-2 0V9H2a1 1 0 110-2h5V2a1 1 0 011-1z"/></svg>
+          Novo Serviço
+        </button>
+      </div>
+      <div id="services-list"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+<div id="modal-container"></div>
+
+<script>
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let S = {
+  clients: [
+    {id:1, name:'Empresa A', color:'#5c9eff'},
+    {id:2, name:'Studio B', color:'#5cffa0'}
+  ],
+  services: [
+    {id:1, name:'Arte', price:40},
+    {id:2, name:'Vídeo', price:120},
+    {id:3, name:'Logo', price:200},
+    {id:4, name:'Carrossel', price:50}
+  ],
+  entries: [
+    {id:1, clientId:1, serviceId:1, qty:3, price:40, status:'recebido', date:'2025-03-10', desc:''},
+    {id:2, clientId:2, serviceId:1, qty:2, price:30, status:'pendente', date:'2025-03-18', desc:''},
+    {id:3, clientId:1, serviceId:2, qty:1, price:120, status:'pendente', date:'2025-03-20', desc:'Reel produto'},
+  ],
+  demands: [
+    {id:1, clientId:1, title:'Identidade Visual', desc:'Logo + paleta de cores + tipografia', status:'em_andamento', priority:'urgente', due:'2025-04-05', entryIds:[]},
+    {id:2, clientId:2, title:'Artes para redes', desc:'Pack 10 artes stories', status:'a_fazer', priority:'normal', due:'2025-04-12', entryIds:[]},
+    {id:3, clientId:1, title:'Vídeo institucional', desc:'2 min de duração, roteiro incluso', status:'revisao', priority:'normal', due:'2025-04-20', entryIds:[3]},
+  ],
+  clientPrices: [],
+  nextId: 20
+};
+let expanded = {};
+
+function save() { try { localStorage.setItem('flhub', JSON.stringify(S)); } catch(e){} }
+function load() { try { const d = localStorage.getItem('flhub'); if(d) S = JSON.parse(d); if(!S.clientPrices) S.clientPrices = []; if(!S.demands) S.demands = []; } catch(e){} }
+load();
+
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+const gc = id => S.clients.find(c=>c.id===id)||{name:'—',color:'#555'};
+const gs = id => S.services.find(s=>s.id===id)||{name:'—',price:0};
+const gd = id => S.demands.find(d=>d.id===id)||null;
+const fmt = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const uid = () => S.nextId++;
+
+function daysUntil(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const now = new Date(); now.setHours(0,0,0,0);
+  return Math.round((d-now)/(1000*60*60*24));
+}
+
+function dueBadge(dateStr) {
+  if(!dateStr) return '';
+  const d = daysUntil(dateStr);
+  if(d < 0) return `<span class="kanban-card-date late">⚠ ${Math.abs(d)}d atrasado</span>`;
+  if(d <= 3) return `<span class="kanban-card-date soon">⏰ ${d === 0 ? 'hoje' : d+'d'}</span>`;
+  return `<span class="kanban-card-date">${dateStr}</span>`;
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────────────────
+function goPage(name, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  renderPage(name);
+}
+
+function renderPage(name) {
+  if(name==='dashboard') renderDashboard();
+  if(name==='kanban') renderKanban();
+  if(name==='financeiro') renderFinanceiro();
+  if(name==='clientes') renderClientes();
+  if(name==='servicos') renderServicos();
+}
+
+// ─── DASHBOARD ─────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const total = S.entries.reduce((s,e)=>s+e.price*e.qty,0);
+  const recebido = S.entries.filter(e=>e.status==='recebido').reduce((s,e)=>s+e.price*e.qty,0);
+  const pendente = total - recebido;
+  const open = S.demands.filter(d=>d.status!=='concluido').length;
+  const late = S.demands.filter(d=>d.status!=='concluido' && d.due && daysUntil(d.due)<0).length;
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total gerado</div><div class="stat-val accent">${fmt(total)}</div></div>
+    <div class="stat-card"><div class="stat-label">Recebido</div><div class="stat-val green">${fmt(recebido)}</div></div>
+    <div class="stat-card"><div class="stat-label">A receber</div><div class="stat-val red">${fmt(pendente)}</div></div>
+    <div class="stat-card"><div class="stat-label">Demandas abertas</div><div class="stat-val blue">${open}${late>0?`<span style="font-size:13px;color:var(--red);margin-left:6px">(${late} atrasada${late>1?'s':''})</span>`:''}</div></div>
+  `;
+
+  // Demandas abertas
+  const openDemands = S.demands.filter(d=>d.status!=='concluido').sort((a,b)=>(a.due||'').localeCompare(b.due||''));
+  const statLabels = {a_fazer:'A Fazer',em_andamento:'Em Andamento',revisao:'Revisão'};
+  document.getElementById('dash-demands').innerHTML = openDemands.length ? `
+    <table><tbody>${openDemands.map(d=>{
+      const c=gc(d.clientId);
+      const days=d.due?daysUntil(d.due):null;
+      const dateClass=days===null?'':(days<0?'late':days<=3?'soon':'');
+      return `<tr>
+        <td style="padding:10px 16px">
+          <div style="font-size:13px;font-weight:500;margin-bottom:3px">${d.title}</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span>
+            ${d.due?`<span class="kanban-card-date ${dateClass}" style="font-size:11px">${days<0?`⚠ ${Math.abs(days)}d atrasado`:days<=3?`⏰ ${days===0?'hoje':days+'d'}`:'📅 '+d.due}</span>`:''}
+          </div>
+        </td>
+        <td style="padding:10px 16px;text-align:right"><span class="badge badge-gray">${statLabels[d.status]||d.status}</span></td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  ` : '<div class="empty-state">Nenhuma demanda aberta</div>';
+
+  // A receber por cliente
+  const byClient = S.clients.map(c=>{
+    const pend = S.entries.filter(e=>e.clientId===c.id&&e.status==='pendente').reduce((s,e)=>s+e.price*e.qty,0);
+    return {...c,pend};
+  }).filter(c=>c.pend>0).sort((a,b)=>b.pend-a.pend);
+
+  document.getElementById('dash-receivables').innerHTML = byClient.length ? `
+    <table><tbody>${byClient.map(c=>`
+      <tr>
+        <td style="padding:10px 16px"><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></td>
+        <td style="padding:10px 16px;text-align:right;font-family:'DM Mono',monospace;font-size:13px;color:var(--red)">${fmt(c.pend)}</td>
+      </tr>`).join('')}</tbody></table>
+  ` : '<div class="empty-state">Nada a receber</div>';
+
+  renderSidebar();
+}
+
+function renderSidebar() {
+  const recebido = S.entries.filter(e=>e.status==='recebido').reduce((s,e)=>s+e.price*e.qty,0);
+  const pendente = S.entries.filter(e=>e.status==='pendente').reduce((s,e)=>s+e.price*e.qty,0);
+  document.getElementById('sidebar-summary').innerHTML = `
+    <div class="summary-mini-row"><span class="summary-mini-label">Recebido</span><span class="summary-mini-val green">${fmt(recebido)}</span></div>
+    <div class="summary-mini-row"><span class="summary-mini-label">A receber</span><span class="summary-mini-val red">${fmt(pendente)}</span></div>
+  `;
+  const late = S.demands.filter(d=>d.status!=='concluido'&&d.due&&daysUntil(d.due)<0).length;
+  document.getElementById('nav-late-dot').style.display = late>0?'inline-block':'none';
+}
+
+// ─── KANBAN ────────────────────────────────────────────────────────────────
+const COLS = [
+  {key:'a_fazer', label:'A Fazer', color:'#555'},
+  {key:'em_andamento', label:'Em Andamento', color:'#5c9eff'},
+  {key:'revisao', label:'Revisão', color:'#ffd166'},
+  {key:'concluido', label:'Concluído', color:'#5cffa0'},
+];
+
+function renderKanban() {
+  const board = document.getElementById('kanban-board');
+  board.innerHTML = COLS.map(col=>{
+    const cards = S.demands.filter(d=>d.status===col.key);
+    return `
+    <div class="kanban-col">
+      <div class="kanban-col-head">
+        <span class="kanban-col-title">
+          <span class="kanban-col-dot" style="background:${col.color}"></span>
+          ${col.label}
+          <span class="kanban-col-count">${cards.length}</span>
+        </span>
+      </div>
+      <div class="kanban-cards" id="col-${col.key}">
+        ${cards.length ? cards.map(d=>renderKanbanCard(d,col.key)).join('') : '<div style="height:4px"></div>'}
+      </div>
+      <button class="add-card-btn" onclick="openDemandModal(null,'${col.key}')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a1 1 0 011 1v5h5a1 1 0 110 2H9v5a1 1 0 11-2 0V9H2a1 1 0 110-2h5V2a1 1 0 011-1z"/></svg>
+        Adicionar
+      </button>
+    </div>`;
+  }).join('');
+  renderSidebar();
+}
+
+function renderKanbanCard(d, colKey) {
+  const c = gc(d.clientId);
+  const linked = d.entryIds && d.entryIds.length;
+  const colIdx = COLS.findIndex(c=>c.key===colKey);
+  const canBack = colIdx > 0;
+  const canFwd = colIdx < COLS.length-1;
+  const linkedTotal = linked ? d.entryIds.reduce((s,eid)=>{const e=S.entries.find(x=>x.id===eid);return s+(e?e.price*e.qty:0);},0) : 0;
+
+  return `<div class="kanban-card ${d.priority||'normal'}" onclick="openDemandDetail(${d.id})">
+    <div class="kanban-card-title">${d.title}</div>
+    ${d.desc?`<div class="kanban-card-desc">${d.desc}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
+      <span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span>
+      ${linked?`<span class="linked-badge" onclick="event.stopPropagation();goToClientEntries(${d.clientId})">⬡ ${fmt(linkedTotal)}</span>`:''}
+    </div>
+    <div class="kanban-card-footer">
+      ${d.due?dueBadge(d.due):'<span></span>'}
+      <div class="kanban-card-actions" onclick="event.stopPropagation()">
+        ${canBack?`<button class="kanban-move-btn" onclick="moveDemand(${d.id},-1)">←</button>`:''}
+        ${canFwd?`<button class="kanban-move-btn" onclick="moveDemand(${d.id},1)">→</button>`:''}
+        <button class="kanban-move-btn" style="color:var(--red)" onclick="deleteDemand(${d.id})">✕</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function moveDemand(id, dir) {
+  const d = gd(id);
+  if(!d) return;
+  const idx = COLS.findIndex(c=>c.key===d.status);
+  const next = COLS[idx+dir];
+  if(next) { d.status = next.key; save(); renderKanban(); }
+}
+
+function deleteDemand(id) {
+  if(!confirm('Remover demanda?')) return;
+  S.demands = S.demands.filter(d=>d.id!==id);
+  save(); renderKanban();
+}
+
+// ─── DEMAND MODAL ──────────────────────────────────────────────────────────
+function openDemandModal(id=null, defaultStatus='a_fazer') {
+  const d = id ? gd(id) : null;
+  const clientOpts = S.clients.map(c=>`<option value="${c.id}" ${d&&d.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
+  const colOpts = COLS.map(col=>`<option value="${col.key}" ${(d?d.status:defaultStatus)===col.key?'selected':''}>${col.label}</option>`).join('');
+  const prioOpts = ['urgente','normal','baixa'].map(p=>`<option value="${p}" ${(d&&d.priority===p)||(!d&&p==='normal')?'selected':''}>${p.charAt(0).toUpperCase()+p.slice(1)}</option>`).join('');
+
+  // Linked entries
+  const linkedIds = d && d.entryIds ? [...d.entryIds] : [];
+  const entryOpts = S.entries.map(e=>{
+    const c=gc(e.clientId); const sv=gs(e.serviceId);
+    const checked = linkedIds.includes(e.id)?'checked':'';
+    return `<label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:12px;color:var(--text2)">
+      <input type="checkbox" value="${e.id}" ${checked} style="width:auto;accent-color:var(--accent)">
+      <span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span>
+      <span>${sv.name}${e.desc?' — '+e.desc:''}</span>
+      <span style="margin-left:auto;font-family:'DM Mono',monospace">${fmt(e.price*e.qty)}</span>
+    </label>`;
+  }).join('');
+
+  showModal(`
+    <div class="modal-header">
+      <div class="modal-title">${d?'Editar Demanda':'Nova Demanda'}</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group"><label>Título</label><input id="dm-title" value="${d?d.title:''}" placeholder="Ex: Identidade Visual"></div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Cliente</label><select id="dm-client">${clientOpts}</select></div>
+      <div class="form-group"><label>Status</label><select id="dm-status">${colOpts}</select></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Prioridade</label><select id="dm-priority">${prioOpts}</select></div>
+      <div class="form-group"><label>Data de entrega</label><input type="date" id="dm-due" value="${d&&d.due?d.due:''}"></div>
+    </div>
+    <div class="form-group"><label>Descrição</label><textarea id="dm-desc" placeholder="Detalhes da demanda...">${d?d.desc:''}</textarea></div>
+    <div class="form-group">
+      <label>Vincular lançamentos financeiros</label>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;max-height:180px;overflow-y:auto">
+        ${S.entries.length ? entryOpts : '<div style="color:var(--text3);font-size:12px">Nenhum lançamento cadastrado ainda.</div>'}
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">Vincule lançamentos para ver o valor financeiro direto no card da demanda.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveDemand(${d?d.id:'null'})">${d?'Salvar':'Criar Demanda'}</button>
+    </div>
+  `);
+}
+
+function saveDemand(id) {
+  const title = document.getElementById('dm-title').value.trim();
+  if(!title) { alert('Título obrigatório'); return; }
+  const clientId = parseInt(document.getElementById('dm-client').value);
+  const status = document.getElementById('dm-status').value;
+  const priority = document.getElementById('dm-priority').value;
+  const due = document.getElementById('dm-due').value;
+  const desc = document.getElementById('dm-desc').value.trim();
+  const entryIds = [...document.querySelectorAll('#modal-container input[type=checkbox]:checked')].map(el=>parseInt(el.value));
+
+  if(id && id !== 'null') {
+    const d = gd(id);
+    Object.assign(d, {title,clientId,status,priority,due,desc,entryIds});
+  } else {
+    S.demands.push({id:uid(),title,clientId,status,priority,due,desc,entryIds});
+  }
+  save(); closeModal(); renderKanban();
+}
+
+function openDemandDetail(id) {
+  const d = gd(id); if(!d) return;
+  const c = gc(d.clientId);
+  const colLabel = COLS.find(col=>col.key===d.status)?.label||d.status;
+  const linkedEntries = (d.entryIds||[]).map(eid=>S.entries.find(e=>e.id===eid)).filter(Boolean);
+  const linkedTotal = linkedEntries.reduce((s,e)=>s+e.price*e.qty,0);
+
+  showModal(`
+    <div class="modal-header">
+      <div class="modal-title">${d.title}</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+      <span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span>
+      <span class="badge badge-gray">${colLabel}</span>
+      <span class="badge ${d.priority==='urgente'?'badge-red':d.priority==='normal'?'badge-yellow':'badge-gray'}">${d.priority}</span>
+      ${d.due?`<span class="badge badge-gray">📅 ${d.due}</span>`:''}
+    </div>
+    ${d.desc?`<p style="color:var(--text2);font-size:13px;line-height:1.6;margin-bottom:18px">${d.desc}</p>`:''}
+    ${linkedEntries.length?`
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-family:'DM Mono',monospace;margin-bottom:10px">Lançamentos vinculados</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden">
+          <table class="sub-table">
+            <thead><tr><th>Serviço</th><th>Qtd</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody>${linkedEntries.map(e=>{
+              const sv=gs(e.serviceId);
+              const badge=e.status==='recebido'?'badge-green':'badge-yellow';
+              return `<tr>
+                <td style="color:var(--text)">${sv.name}${e.desc?' <span style="color:var(--text3)">— '+e.desc+'</span>':''}</td>
+                <td>${e.qty}</td>
+                <td style="font-family:'DM Mono',monospace">${fmt(e.price*e.qty)}</td>
+                <td><span class="badge ${badge}" style="cursor:pointer" onclick="toggleEntryStatus(${e.id});this.closest('.modal-overlay').remove();openDemandDetail(${d.id})">${e.status==='recebido'?'Recebido':'Pendente'}</span></td>
+              </tr>`;
+            }).join('')}
+            <tr><td colspan="2" style="color:var(--text3);font-size:11px">Total vinculado</td><td colspan="2" style="font-family:'DM Mono',monospace;font-weight:500;color:var(--accent)">${fmt(linkedTotal)}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`:''}
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="deleteDemand(${d.id});closeModal()">Remover</button>
+      <button class="btn" onclick="closeModal()">Fechar</button>
+      <button class="btn btn-accent" onclick="closeModal();openDemandModal(${d.id})">Editar</button>
+    </div>
+  `);
+}
+
+// ─── FINANCEIRO ─────────────────────────────────────────────────────────────
+function renderFinanceiro() {
+  const total = S.entries.reduce((s,e)=>s+e.price*e.qty,0);
+  const recebido = S.entries.filter(e=>e.status==='recebido').reduce((s,e)=>s+e.price*e.qty,0);
+  const pendente = total-recebido;
+
+  document.getElementById('fin-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total gerado</div><div class="stat-val accent">${fmt(total)}</div></div>
+    <div class="stat-card"><div class="stat-label">Recebido</div><div class="stat-val green">${fmt(recebido)}</div></div>
+    <div class="stat-card"><div class="stat-label">A receber</div><div class="stat-val red">${fmt(pendente)}</div></div>
+    <div class="stat-card"><div class="stat-label">Clientes ativos</div><div class="stat-val blue">${S.clients.length}</div></div>
+  `;
+
+  const fc = document.getElementById('filter-client').value;
+  const fs = document.getElementById('filter-status').value;
+  const opts = S.clients.map(c=>`<option value="${c.id}" ${fc==c.id?'selected':''}>${c.name}</option>`).join('');
+  document.getElementById('filter-client').innerHTML = '<option value="">Todos clientes</option>'+opts;
+
+  let list = S.entries.filter(e=>{
+    if(fc && e.clientId!==parseInt(fc)) return false;
+    return true;
+  });
+
+  // group by client
+  const groups = {};
+  list.forEach(e=>{ if(!groups[e.clientId]) groups[e.clientId]={clientId:e.clientId,entries:[]}; groups[e.clientId].entries.push(e); });
+  let clientGroups = Object.values(groups);
+  if(fs) clientGroups = clientGroups.map(g=>({...g,entries:g.entries.filter(e=>e.status===fs)})).filter(g=>g.entries.length>0);
+  clientGroups.sort((a,b)=>{
+    const ra=a.entries.map(e=>e.date).sort().reverse()[0];
+    const rb=b.entries.map(e=>e.date).sort().reverse()[0];
+    return rb.localeCompare(ra);
+  });
+
+  if(!clientGroups.length) {
+    document.getElementById('entries-table').innerHTML='<div class="empty-state">Nenhum lançamento encontrado.</div>';
+    return;
+  }
+
+  let html = `<div class="table-wrap"><table>
+    <thead><tr><th></th><th>Cliente</th><th>Serviços</th><th>Total</th><th>A receber</th><th>Status</th><th></th></tr></thead>
+    <tbody>`;
+
+  clientGroups.forEach(g=>{
+    const c = gc(g.clientId);
+    const total = g.entries.reduce((s,e)=>s+e.price*e.qty,0);
+    const pend = g.entries.filter(e=>e.status==='pendente').reduce((s,e)=>s+e.price*e.qty,0);
+    const allRec = g.entries.every(e=>e.status==='recebido');
+    const allPend = g.entries.every(e=>e.status==='pendente');
+    const badge = allRec?'badge-green':allPend?'badge-yellow':'badge-blue';
+    const label = allRec?'Recebido':allPend?'Pendente':'Parcial';
+    const isOpen = !!expanded[g.clientId];
+    const svcNames = [...new Set(g.entries.map(e=>gs(e.serviceId).name))].join(', ');
+
+    // Demandas vinculadas a esse cliente
+    const dems = S.demands.filter(d=>d.status!=='concluido'&&d.clientId===g.clientId);
+
+    html += `<tr class="group-row" onclick="toggleExpand(${g.clientId})">
+      <td style="width:32px">
+        <span class="expand-btn ${isOpen?'open':''}">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 4l4 4-4 4"/></svg>
+        </span>
+      </td>
+      <td>
+        <span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span>
+        ${dems.length?`<span class="linked-badge" style="margin-left:6px" onclick="event.stopPropagation();goPage('kanban',document.querySelectorAll('.nav-item')[1])">⬡ ${dems.length} demanda${dems.length>1?'s':''}</span>`:''}
+      </td>
+      <td style="color:var(--text3);font-size:12px">${svcNames}</td>
+      <td style="font-family:'DM Mono',monospace;font-weight:500">${fmt(total)}</td>
+      <td style="font-family:'DM Mono',monospace;color:${pend>0?'var(--red)':'var(--text3)'}">${pend>0?fmt(pend):'—'}</td>
+      <td><span class="badge ${badge}">${label}</span></td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteClientEntries(${g.clientId})">Remover</button>
+      </td>
+    </tr>
+    <tr id="detail-${g.clientId}" style="display:${isOpen?'table-row':'none'}">
+      <td colspan="7" style="padding:0;background:var(--bg)">
+        <div style="padding:8px 16px 16px 48px">
+          <table class="sub-table">
+            <thead><tr><th>Data</th><th>Serviço</th><th>Qtd</th><th>Valor unit.</th><th>Total</th><th>Status</th><th></th></tr></thead>
+            <tbody>${g.entries.sort((a,b)=>b.date.localeCompare(a.date)).map(e=>{
+              const sv=gs(e.serviceId);
+              const eb=e.status==='recebido'?'badge-green':'badge-yellow';
+              return `<tr>
+                <td>${e.date}</td>
+                <td style="color:var(--text)">${sv.name}${e.desc?' <span style="color:var(--text3)">— '+e.desc+'</span>':''}</td>
+                <td>${e.qty}</td>
+                <td style="font-family:'DM Mono',monospace">${fmt(e.price)}</td>
+                <td style="font-family:'DM Mono',monospace;font-weight:500">${fmt(e.price*e.qty)}</td>
+                <td><span class="badge ${eb}" style="cursor:pointer" onclick="toggleEntryStatus(${e.id})">${e.status==='recebido'?'Recebido':'Pendente'}</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="deleteEntry(${e.id})">✕</button></td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  document.getElementById('entries-table').innerHTML = html;
+  renderSidebar();
+}
+
+function toggleExpand(cid) {
+  expanded[cid]=!expanded[cid];
+  const det=document.getElementById('detail-'+cid);
+  if(det) det.style.display=expanded[cid]?'table-row':'none';
+  const btn=det?.previousElementSibling?.querySelector('.expand-btn');
+  if(btn) btn.classList.toggle('open',expanded[cid]);
+}
+
+function toggleEntryStatus(id) {
+  const e=S.entries.find(x=>x.id===id);
+  if(e){e.status=e.status==='recebido'?'pendente':'recebido';save();renderFinanceiro();}
+}
+
+function deleteEntry(id) {
+  S.entries=S.entries.filter(e=>e.id!==id);
+  S.demands.forEach(d=>{if(d.entryIds)d.entryIds=d.entryIds.filter(eid=>eid!==id);});
+  save();renderFinanceiro();
+}
+
+function deleteClientEntries(cid) {
+  const c=gc(cid);
+  if(!confirm(`Remover todos lançamentos de ${c.name}?`))return;
+  const ids=S.entries.filter(e=>e.clientId===cid).map(e=>e.id);
+  S.entries=S.entries.filter(e=>e.clientId!==cid);
+  S.demands.forEach(d=>{if(d.entryIds)d.entryIds=d.entryIds.filter(id=>!ids.includes(id));});
+  save();renderFinanceiro();
+}
+
+// ─── ENTRY MODAL ───────────────────────────────────────────────────────────
+function openEntryModal() {
+  const clientOpts = S.clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const serviceOpts = S.services.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+
+  showModal(`
+    <div class="modal-header">
+      <div class="modal-title">Novo Lançamento</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Cliente</label><select id="en-client" onchange="fillPrice()">${clientOpts}</select></div>
+      <div class="form-group"><label>Serviço</label><select id="en-service" onchange="fillPrice()">${serviceOpts}</select></div>
+    </div>
+    <div class="form-row form-row-3">
+      <div class="form-group"><label>Quantidade</label><input type="number" id="en-qty" value="1" min="1"></div>
+      <div class="form-group"><label>Valor unit. (R$)</label><input type="number" id="en-price" placeholder="0,00"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="en-date" value="${new Date().toISOString().split('T')[0]}"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Status</label><select id="en-status"><option value="pendente">Pendente</option><option value="recebido">Recebido</option></select></div>
+      <div class="form-group"><label>Descrição (opcional)</label><input type="text" id="en-desc" placeholder="Ex: Reel produto"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveEntry()">Adicionar</button>
+    </div>
+  `);
+  fillPrice();
+}
+
+function fillPrice() {
+  const cid=parseInt(document.getElementById('en-client')?.value);
+  const sid=parseInt(document.getElementById('en-service')?.value);
+  if(!cid||!sid)return;
+  const cp=(S.clientPrices||[]).find(p=>p.clientId===cid&&p.serviceId===sid);
+  const sv=gs(sid);
+  const price=cp?cp.price:sv.price;
+  const el=document.getElementById('en-price');
+  if(el)el.value=price;
+}
+
+function saveEntry() {
+  const clientId=parseInt(document.getElementById('en-client').value);
+  const serviceId=parseInt(document.getElementById('en-service').value);
+  const qty=parseInt(document.getElementById('en-qty').value)||1;
+  const price=parseFloat(document.getElementById('en-price').value)||0;
+  const status=document.getElementById('en-status').value;
+  const date=document.getElementById('en-date').value;
+  const desc=document.getElementById('en-desc').value.trim();
+  if(!price){alert('Informe o valor.');return;}
+  S.entries.push({id:uid(),clientId,serviceId,qty,price,status,date,desc});
+  expanded[clientId]=true;
+  save();closeModal();renderFinanceiro();
+}
+
+// ─── CLIENTES ──────────────────────────────────────────────────────────────
+function renderClientes() {
+  const el=document.getElementById('clients-list');
+  if(!S.clients.length){el.innerHTML='<div class="empty-state">Nenhum cliente cadastrado.</div>';return;}
+  el.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr><th>Cliente</th><th>Lançamentos</th><th>Total</th><th>A receber</th><th>Demandas abertas</th><th>Preços personalizados</th><th></th></tr></thead>
+    <tbody>${S.clients.map(c=>{
+      const es=S.entries.filter(e=>e.clientId===c.id);
+      const total=es.reduce((s,e)=>s+e.price*e.qty,0);
+      const pend=es.filter(e=>e.status==='pendente').reduce((s,e)=>s+e.price*e.qty,0);
+      const openDems=S.demands.filter(d=>d.clientId===c.id&&d.status!=='concluido').length;
+      const cp=(S.clientPrices||[]).filter(p=>p.clientId===c.id);
+      const cpText=cp.length?cp.map(p=>`${gs(p.serviceId).name}: R$ ${p.price}`).join(' · '):'<span style="color:var(--text3)">Padrão</span>';
+      return `<tr>
+        <td><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></td>
+        <td>${es.length}</td>
+        <td style="font-family:'DM Mono',monospace">${fmt(total)}</td>
+        <td style="font-family:'DM Mono',monospace;color:${pend>0?'var(--red)':'var(--text3)'}">${pend>0?fmt(pend):'—'}</td>
+        <td>${openDems>0?`<span class="badge badge-blue">${openDems} demanda${openDems>1?'s':''}</span>`:'<span style="color:var(--text3)">—</span>'}</td>
+        <td style="font-size:12px;color:var(--text2)">${cpText}</td>
+        <td><div style="display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="openPriceModal(${c.id})">Preços</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteClient(${c.id})">Remover</button>
+        </div></td>
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+function openClientModal() {
+  showModal(`
+    <div class="modal-header">
+      <div class="modal-title">Novo Cliente</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Nome</label><input id="cl-name" placeholder="Nome do cliente"></div>
+      <div class="form-group"><label>Cor</label><input type="color" id="cl-color" value="#5c9eff" style="width:100%"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveClient()">Criar</button>
+    </div>
+  `);
+}
+
+function saveClient() {
+  const name=document.getElementById('cl-name').value.trim();
+  const color=document.getElementById('cl-color').value;
+  if(!name)return;
+  S.clients.push({id:uid(),name,color});
+  save();closeModal();renderClientes();
+}
+
+function deleteClient(id) {
+  const c=gc(id);
+  if(!confirm(`Remover ${c.name} e todos os dados?`))return;
+  S.clients=S.clients.filter(c=>c.id!==id);
+  S.entries=S.entries.filter(e=>e.clientId!==id);
+  S.demands=S.demands.filter(d=>d.clientId!==id);
+  S.clientPrices=(S.clientPrices||[]).filter(p=>p.clientId!==id);
+  save();renderClientes();
+}
+
+function openPriceModal(cid) {
+  const c=gc(cid);
+  const rows=S.services.map(s=>{
+    const cp=(S.clientPrices||[]).find(p=>p.clientId===cid&&p.serviceId===s.id);
+    return `<div class="form-group">
+      <label>${s.name} <span style="color:var(--text3)">(padrão: R$ ${s.price})</span></label>
+      <input type="number" value="${cp?cp.price:s.price}" data-sid="${s.id}" placeholder="R$">
+    </div>`;
+  }).join('');
+  showModal(`
+    <div class="modal-header">
+      <div class="modal-title">Preços para ${c.name}</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <p style="color:var(--text2);font-size:12px;margin-bottom:16px">Defina valores personalizados para cada serviço. Deixe em branco para usar o preço padrão.</p>
+    ${rows}
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveClientPrices(${cid})">Salvar</button>
+    </div>
+  `);
+}
+
+function saveClientPrices(cid) {
+  if(!S.clientPrices) S.clientPrices=[];
+  S.clientPrices=S.clientPrices.filter(p=>p.clientId!==cid);
+  document.querySelectorAll('#modal-container [data-sid]').forEach(inp=>{
+    S.clientPrices.push({clientId:cid,serviceId:parseInt(inp.dataset.sid),price:parseFloat(inp.value)||0});
+  });
+  save();closeModal();renderClientes();
+}
+
+// ─── SERVIÇOS ──────────────────────────────────────────────────────────────
+function renderServicos() {
+  const el=document.getElementById('services-list');
+  el.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr><th>Serviço</th><th>Preço padrão</th><th>Lançamentos</th><th></th></tr></thead>
+    <tbody>${S.services.map(s=>{
+      const count=S.entries.filter(e=>e.serviceId===s.id).length;
+      return `<tr>
+        <td style="font-weight:500">${s.name}</td>
+        <td><input type="number" value="${s.price}" style="width:120px" onchange="updateSvcPrice(${s.id},this.value)"></td>
+        <td>${count}</td>
+        <td><button class="btn btn-sm btn-danger" onclick="deleteService(${s.id})">Remover</button></td>
+      </tr>`;
+    }).join('')}${!S.services.length?'<tr><td colspan="4" class="empty-state">Nenhum serviço.</td></tr>':''}</tbody></table></div>`;
+}
+
+function openServiceModal() {
+  showModal(`
+    <div class="modal-header">
+      <div class="modal-title">Novo Serviço</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Nome</label><input id="sv-name" placeholder="Ex: Arte, Vídeo, Logo..."></div>
+      <div class="form-group"><label>Preço padrão (R$)</label><input type="number" id="sv-price" placeholder="0,00"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveService()">Criar</button>
+    </div>
+  `);
+}
+
+function saveService() {
+  const name=document.getElementById('sv-name').value.trim();
+  const price=parseFloat(document.getElementById('sv-price').value)||0;
+  if(!name)return;
+  S.services.push({id:uid(),name,price});
+  save();closeModal();renderServicos();
+}
+
+function updateSvcPrice(id,val) {
+  const s=S.services.find(x=>x.id===id);
+  if(s){s.price=parseFloat(val)||0;save();}
+}
+
+function deleteService(id) {
+  if(!confirm('Remover serviço?'))return;
+  S.services=S.services.filter(s=>s.id!==id);
+  save();renderServicos();
+}
+
+// ─── MODAL HELPERS ─────────────────────────────────────────────────────────
+function showModal(html) {
+  const mc=document.getElementById('modal-container');
+  mc.innerHTML=`<div class="modal-overlay" onclick="handleOverlayClick(event)"><div class="modal">${html}</div></div>`;
+}
+function closeModal() { document.getElementById('modal-container').innerHTML=''; }
+function handleOverlayClick(e) { if(e.target.classList.contains('modal-overlay')) closeModal(); }
+
+// ─── NAV HELPERS ───────────────────────────────────────────────────────────
+function goToClientEntries(cid) {
+  expanded[cid]=true;
+  const navItem = [...document.querySelectorAll('.nav-item')].find(el=>el.textContent.includes('Lançamentos'));
+  goPage('financeiro', navItem);
+}
+
+// ─── AUTH ──────────────────────────────────────────────────────────────────
+const PASSWORD_HASH = '323ef810dd19f40b77e63de99e457a172a477d36f3affd41305dd81deadc33a0';
+const SESSION_KEY = 'flhub_auth';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function showLoginScreen() {
+  document.querySelector('.shell').style.display = 'none';
+  const login = document.createElement('div');
+  login.id = 'login-screen';
+  login.innerHTML = `
+    <style>
+      #login-screen {
+        position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;
+      }
+      .login-box {
+        background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:40px 36px;width:360px;text-align:center;
+      }
+      .login-logo { font-size:22px;font-weight:600;letter-spacing:-0.5px;margin-bottom:4px; }
+      .login-logo span { color:var(--accent); }
+      .login-sub { font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:32px; }
+      .login-box input {
+        background:var(--bg3);border:1px solid var(--border);color:var(--text);
+        border-radius:8px;padding:11px 14px;font-size:14px;width:100%;margin-bottom:12px;
+        font-family:'DM Sans',sans-serif;text-align:center;letter-spacing:2px;
+      }
+      .login-box input:focus { outline:none;border-color:var(--border2); }
+      .login-btn {
+        width:100%;padding:11px;background:var(--accent);color:var(--accent-text);
+        border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;
+        font-family:'DM Sans',sans-serif;transition:opacity .15s;
+      }
+      .login-btn:hover { opacity:.85; }
+      .login-err { font-size:12px;color:var(--red);margin-top:10px;min-height:18px; }
+    </style>
+    <div class="login-box">
+      <div class="login-logo">Freelance<span>Hub</span></div>
+      <div class="login-sub">acesso restrito</div>
+      <input type="password" id="login-input" placeholder="••••••••••" onkeydown="if(event.key==='Enter')tryLogin()">
+      <button class="login-btn" onclick="tryLogin()">Entrar</button>
+      <div class="login-err" id="login-err"></div>
+    </div>
+  `;
+  document.body.appendChild(login);
+  setTimeout(()=>document.getElementById('login-input')?.focus(), 100);
+}
+
+async function tryLogin() {
+  const val = document.getElementById('login-input').value;
+  const hash = await sha256(val);
+  if(hash === PASSWORD_HASH) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('login-screen').remove();
+    document.querySelector('.shell').style.display = 'flex';
+    renderDashboard();
+  } else {
+    const err = document.getElementById('login-err');
+    err.textContent = 'Senha incorreta.';
+    document.getElementById('login-input').value = '';
+    document.getElementById('login-input').focus();
+    setTimeout(()=>err.textContent='', 2500);
+  }
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+if(sessionStorage.getItem(SESSION_KEY) === '1') {
+  renderDashboard();
+} else {
+  showLoginScreen();
+}
+</script>
+</body>
+</html>
