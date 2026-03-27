@@ -7,171 +7,150 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0f0f0f; --bg2: #181818; --bg3: #222222; --bg4: #2a2a2a;
-  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
-  --text: #f0f0f0; --text2: #888; --text3: #555;
-  --accent: #ff8a00; --accent-dim: rgba(255, 138, 0, 0.12); --accent-text: #ffffff; 
-  --red: #ff5c5c; --red-dim: rgba(255,92,92,0.1);
-  --yellow: #ffd166; --yellow-dim: rgba(255,209,102,0.1);
-  --blue: #5c9eff; --blue-dim: rgba(92,158,255,0.1);
-  --green: #5cffa0; --green-dim: rgba(92,255,160,0.1);
-  --radius: 10px; --radius-sm: 6px;
-  font-family: 'DM Sans', sans-serif;
+:root{--bg:#0f0f0f;--bg2:#181818;--bg3:#222222;--bg4:#2a2a2a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#f0f0f0;--text2:#888;--text3:#555;--accent:#ff8a00;--accent-dim:rgba(255,138,0,0.12);--accent-text:#ffffff;--red:#ff5c5c;--red-dim:rgba(255,92,92,0.1);--yellow:#ffd166;--yellow-dim:rgba(255,209,102,0.1);--blue:#5c9eff;--blue-dim:rgba(92,158,255,0.1);--green:#5cffa0;--green-dim:rgba(92,255,160,0.1);--radius:10px;--radius-sm:6px;font-family:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+.hide-values .val-money{filter:blur(5px);opacity:.7;pointer-events:none;user-select:none}
+.shell{display:flex;min-height:100vh}
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:1000;transition:transform .3s ease}
+.main{flex:1;overflow:auto;position:relative;width:100%}
+.sync-badge{position:absolute;top:12px;right:36px;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;z-index:10;transition:all .3s}
+.sync-badge.syncing{color:var(--yellow)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.syncing .sync-dot{background:var(--yellow);animation:pulse 1s infinite}
+@keyframes pulse{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
+.logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.logo-mark{font-size:18px;font-weight:600;letter-spacing:-0.5px}
+.logo-mark span{color:var(--accent)}
+.logo-sub{font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace}
+.nav{padding:16px 12px;flex:1;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:13px;font-weight:400;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+.nav-section{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:16px 10px 6px;font-family:'DM Mono',monospace}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.mobile-header{display:none;background:var(--bg2);padding:16px 20px;border-bottom:1px solid var(--border);align-items:center;justify-content:space-between;position:sticky;top:0;z-index:900}
+.mobile-header-logo{font-size:18px;font-weight:600;letter-spacing:-0.5px}
+.mobile-header-logo span{color:var(--accent)}
+.mobile-menu-btn{background:none;border:none;color:var(--text);padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mobile-menu-btn svg{width:24px;height:24px}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:990;backdrop-filter:blur(2px);transition:opacity .3s;opacity:0;pointer-events:none}
+.page{display:none;padding:32px 36px}
+.page.active{display:block}
+.page-header{margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-start}
+.page-title{font-size:22px;font-weight:600;letter-spacing:-0.5px}
+.page-title-home{font-size:26px;font-weight:500;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px}
+.page-sub{font-size:13px;color:var(--text2);margin-top:3px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.home-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-family:'DM Mono',monospace;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.stat-val{font-size:24px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:-1px}
+.val-accent{color:var(--accent)}.val-green{color:var(--green)}.val-red{color:var(--red)}.val-blue{color:var(--blue)}.val-yellow{color:var(--yellow)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s;justify-content:center}
+.btn:hover{background:var(--bg4);border-color:var(--border2)}
+.btn-accent{background:var(--accent);color:var(--accent-text);border-color:transparent;font-weight:600}
+.btn-accent:hover{opacity:.9}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--text2)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-danger{background:transparent;border-color:transparent;color:var(--red)}
+.btn-danger:hover{background:var(--red-dim)}
+.btn-sm{padding:5px 10px;font-size:12px}
+input,select,textarea{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;transition:border .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+label{font-size:11px;color:var(--text3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-family:'DM Mono',monospace}
+.form-group{margin-bottom:14px}
+.form-row{display:grid;gap:12px}.form-row-2{grid-template-columns:1fr 1fr}.form-row-3{grid-template-columns:1fr 1fr 1fr}
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;background:var(--bg2);white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px 2px 5px;border-radius:20px;font-size:11px;background:var(--bg4);border:1px solid var(--border);white-space:nowrap}
+.chip-dot{width:7px;height:7px;border-radius:50%}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;display:inline-block}
+.badge-green{background:var(--green-dim);color:var(--green)}.badge-green::before{background:var(--green)}
+.badge-red{background:var(--red-dim);color:var(--red)}.badge-red::before{background:var(--red)}
+.badge-yellow{background:var(--yellow-dim);color:var(--yellow)}.badge-yellow::before{background:var(--yellow)}
+.badge-gray{background:rgba(255,255,255,0.06);color:var(--text2)}.badge-gray::before{background:var(--text3)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+.modal-overlay,.modal-overlay-quick{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(3px)}
+.modal-overlay-quick{z-index:3000}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:28px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-sm{width:400px}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.modal-title{font-size:17px;font-weight:600;letter-spacing:-0.3px}
+.modal-footer{display:flex;justify-content:space-between;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
+.kanban-wrap{display:flex;gap:16px;overflow-x:auto;padding-bottom:16px;align-items:flex-start;-webkit-overflow-scrolling:touch}
+.kanban-col{min-width:270px;width:270px;flex-shrink:0}
+.kanban-col-head{display:flex;justify-content:space-between;padding:0 2px 12px}
+.kanban-col-title{font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text2);font-family:'DM Mono',monospace}
+.kanban-cards{display:flex;flex-direction:column;gap:10px;min-height:80px}
+.kanban-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:transform .12s;border-left:3px solid transparent}
+.kanban-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.kanban-card.atrasado{border-left-color:var(--red);background:linear-gradient(90deg,var(--red-dim) 0%,transparent 100%)}
+.kanban-card.hoje{border-left-color:var(--yellow)}
+.kanban-card-title{font-size:13px;font-weight:500;margin-bottom:8px}
+.kanban-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.kanban-card-actions{display:flex;gap:4px;opacity:0;transition:opacity .12s}
+.kanban-card:hover .kanban-card-actions{opacity:1}
+.kanban-move-btn{background:var(--bg4);border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer;transition:all .12s}
+.kanban-move-btn:hover{background:var(--bg3);border-color:var(--accent);color:var(--accent)}
+.section-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;height:100%}
+.section-box-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.quick-add-wrap{display:flex;gap:8px}
+.quick-add-btn{background:var(--bg4);border:1px solid var(--border);color:var(--text);border-radius:6px;width:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.quick-add-btn:hover{background:var(--bg3);color:var(--accent)}
+.chart-container{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;height:160px;padding:30px 20px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:28px}
+.chart-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative}
+.chart-bar{width:100%;background:var(--bg4);border-radius:4px 4px 0 0;transition:height .5s ease,background .3s;position:relative}
+.chart-col:last-child .chart-bar{background:var(--accent)}
+.chart-bar:hover{filter:brightness(1.2)}
+.chart-val{position:absolute;top:-20px;font-size:11px;font-family:'DM Mono',monospace;color:var(--text);white-space:nowrap}
+.chart-label{margin-top:8px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase}
+
+/* TRUQUE DO DARK MODE NO IFRAME DO GOOGLE CALENDAR */
+.iframe-container{position:relative;width:100%;height:calc(100vh - 180px);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--bg2)}
+.iframe-container iframe{
+  width:100%;
+  height:100%;
+  border:none;
+  /* Isso inverte a cor branca para preto, e o hue-rotate mantém as cores das etiquetas de evento corretas! */
+  filter: invert(0.92) hue-rotate(180deg) contrast(1.05);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
-.hide-values .val-money { filter: blur(5px); opacity: 0.7; pointer-events: none; user-select: none; }
 
-.shell { display: flex; min-height: 100vh; }
-.sidebar { width: 220px; min-width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; z-index: 1000; transition: transform 0.3s ease; }
-.main { flex: 1; overflow: auto; position: relative; width: 100%; }
-.sync-badge { position: absolute; top: 12px; right: 36px; font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; z-index: 10; transition: all 0.3s; }
-.sync-badge.syncing { color: var(--yellow); }
-.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
-.syncing .sync-dot { background: var(--yellow); animation: pulse 1s infinite; }
-@keyframes pulse { 0% { opacity: .5; } 50% { opacity: 1; } 100% { opacity: .5; } }
-
-.logo { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); }
-.logo-mark { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
-.logo-mark span { color: var(--accent); }
-.logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
-.nav { padding: 16px 12px; flex: 1; overflow-y: auto; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text2); font-size: 13px; font-weight: 400; transition: all .15s; border: none; background: none; width: 100%; text-align: left; }
-.nav-item:hover { background: var(--bg3); color: var(--text); }
-.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 500; }
-.nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
-.nav-section { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; padding: 16px 10px 6px; font-family: 'DM Mono', monospace; }
-.sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
-
-.mobile-header { display: none; background: var(--bg2); padding: 16px 20px; border-bottom: 1px solid var(--border); align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 900; }
-.mobile-header-logo { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
-.mobile-header-logo span { color: var(--accent); }
-.mobile-menu-btn { background: none; border: none; color: var(--text); padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.mobile-menu-btn svg { width: 24px; height: 24px; }
-.sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 990; backdrop-filter: blur(2px); transition: opacity 0.3s; opacity: 0; pointer-events: none; }
-
-.page { display: none; padding: 32px 36px; }
-.page.active { display: block; }
-.page-header { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start; }
-.page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
-.page-title-home { font-size: 26px; font-weight: 500; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
-.page-sub { font-size: 13px; color: var(--text2); margin-top: 3px; }
-
-.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
-.home-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; }
-.stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
-.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; font-family: 'DM Mono', monospace; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-.stat-val { font-size: 24px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -1px; }
-.val-accent { color: var(--accent); } .val-green { color: var(--green); } .val-red { color: var(--red); } .val-blue { color: var(--blue); } .val-yellow { color: var(--yellow); }
-
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); cursor: pointer; font-size: 13px; transition: all .15s; justify-content: center;}
-.btn:hover { background: var(--bg4); border-color: var(--border2); }
-.btn-accent { background: var(--accent); color: var(--accent-text); border-color: transparent; font-weight: 600; }
-.btn-accent:hover { opacity: 0.9; }
-.btn-ghost { background: transparent; border-color: transparent; color: var(--text2); }
-.btn-ghost:hover { background: var(--bg3); color: var(--text); }
-.btn-danger { background: transparent; border-color: transparent; color: var(--red); }
-.btn-danger:hover { background: var(--red-dim); }
-.btn-sm { padding: 5px 10px; font-size: 12px; }
-
-input, select, textarea { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; width: 100%; transition: border .15s; }
-input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
-label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em; font-family: 'DM Mono', monospace; }
-.form-group { margin-bottom: 14px; }
-.form-row { display: grid; gap: 12px; } .form-row-2 { grid-template-columns: 1fr 1fr; } .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
-.table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; -webkit-overflow-scrolling: touch; }
-table { width: 100%; border-collapse: collapse; }
-th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; background: var(--bg2); white-space: nowrap; }
-td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 13px; }
-.chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 5px; border-radius: 20px; font-size: 11px; background: var(--bg4); border: 1px solid var(--border); white-space: nowrap; }
-.chip-dot { width: 7px; height: 7px; border-radius: 50%; }
-.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
-.badge::before { content:''; width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
-.badge-green { background: var(--green-dim); color: var(--green); } .badge-green::before { background: var(--green); }
-.badge-red { background: var(--red-dim); color: var(--red); } .badge-red::before { background: var(--red); }
-.badge-yellow { background: var(--yellow-dim); color: var(--yellow); } .badge-yellow::before { background: var(--yellow); }
-.badge-gray { background: rgba(255,255,255,0.06); color: var(--text2); } .badge-gray::before { background: var(--text3); }
-.empty-state { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 13px; }
-
-.modal-overlay, .modal-overlay-quick { position: fixed; inset: 0; background: rgba(0,0,0,.65); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
-.modal-overlay-quick { z-index: 3000; }
-.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; padding: 28px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
-.modal-sm { width: 400px; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-.modal-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
-.modal-footer { display: flex; justify-content: space-between; gap: 8px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
-
-.kanban-wrap { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; align-items: flex-start; -webkit-overflow-scrolling: touch; }
-.kanban-col { min-width: 270px; width: 270px; flex-shrink: 0; }
-.kanban-col-head { display: flex; justify-content: space-between; padding: 0 2px 12px; }
-.kanban-col-title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text2); font-family: 'DM Mono', monospace; }
-.kanban-cards { display: flex; flex-direction: column; gap: 10px; min-height: 80px; }
-.kanban-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: transform .12s; border-left: 3px solid transparent; }
-.kanban-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-.kanban-card.atrasado { border-left-color: var(--red); background: linear-gradient(90deg, var(--red-dim) 0%, transparent 100%); }
-.kanban-card.hoje { border-left-color: var(--yellow); }
-.kanban-card-title { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
-.kanban-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
-.kanban-card-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .12s; }
-.kanban-card:hover .kanban-card-actions { opacity: 1; }
-.kanban-move-btn { background: var(--bg4); border: 1px solid var(--border); color: var(--text2); padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all .12s; }
-.kanban-move-btn:hover { background: var(--bg3); border-color: var(--accent); color: var(--accent); }
-
-.section-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; height: 100%; }
-.section-box-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
-.quick-add-wrap { display: flex; gap: 8px; }
-.quick-add-btn { background: var(--bg4); border: 1px solid var(--border); color: var(--text); border-radius: 6px; width: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;}
-.quick-add-btn:hover { background: var(--bg3); color: var(--accent); }
-
-.chart-container { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; height: 160px; padding: 30px 20px 20px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 28px;}
-.chart-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; position: relative; }
-.chart-bar { width: 100%; background: var(--bg4); border-radius: 4px 4px 0 0; transition: height 0.5s ease, background 0.3s; position: relative; }
-.chart-col:last-child .chart-bar { background: var(--accent); }
-.chart-bar:hover { filter: brightness(1.2); }
-.chart-val { position: absolute; top: -20px; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text); white-space: nowrap; }
-.chart-label { margin-top: 8px; font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; text-transform: uppercase; }
-
-.iframe-container { position: relative; width: 100%; height: calc(100vh - 180px); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: var(--bg2); }
-.iframe-container iframe { width: 100%; height: 100%; border: none; }
-
-@media (max-width: 768px) {
-  .mobile-header { display: flex; }
-  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); box-shadow: 4px 0 15px rgba(0,0,0,0.5); }
-  .sidebar.open { transform: translateX(0); }
-  .sidebar-overlay.open { opacity: 1; pointer-events: all; }
-  .page { padding: 24px 20px; }
-  .page-header { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
-  .page-header .btn { width: 100%; }
-  .stat-grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px;}
-  .home-grid { grid-template-columns: 1fr !important; gap: 16px; }
-  .form-row-2, .form-row-3 { grid-template-columns: 1fr; gap: 0; }
-  table { min-width: 650px; } 
-  .modal { padding: 20px; width: 92vw; }
-  .modal-header { margin-bottom: 16px; }
-  .modal-footer { flex-direction: column; gap: 10px; margin-top: 16px; padding-top: 16px;}
-  .modal-footer > div { flex-direction: column; width: 100%; }
-  .modal-footer .btn { width: 100%; margin: 0 !important; }
-  .sync-badge { top: auto; bottom: 16px; right: 16px; background: var(--bg3); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-  .chart-container { height: 130px; padding: 20px 10px 10px; gap: 6px; margin-bottom: 20px;}
-  .chart-val { font-size: 9px; top: -16px; }
-  .chart-label { font-size: 9px; margin-top: 6px;}
-  .kanban-card-actions { opacity: 1; }
-  .kanban-move-btn { padding: 6px 12px; font-size: 14px; background: var(--bg3); }
+@media (max-width:768px){
+  .mobile-header{display:flex}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);box-shadow:4px 0 15px rgba(0,0,0,.5)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{opacity:1;pointer-events:all}
+  .page{padding:24px 20px}
+  .page-header{flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:20px}
+  .page-header .btn{width:100%}
+  .stat-grid{grid-template-columns:1fr;gap:10px;margin-bottom:20px}
+  .home-grid{grid-template-columns:1fr !important;gap:16px}
+  .form-row-2,.form-row-3{grid-template-columns:1fr;gap:0}
+  table{min-width:650px}
+  .modal{padding:20px;width:92vw}
+  .modal-header{margin-bottom:16px}
+  .modal-footer{flex-direction:column;gap:10px;margin-top:16px;padding-top:16px}
+  .modal-footer > div{flex-direction:column;width:100%}
+  .modal-footer .btn{width:100%;margin:0 !important}
+  .sync-badge{top:auto;bottom:16px;right:16px;background:var(--bg3);padding:6px 12px;border-radius:20px;border:1px solid var(--border);box-shadow:0 4px 10px rgba(0,0,0,.5)}
+  .chart-container{height:130px;padding:20px 10px 10px;gap:6px;margin-bottom:20px}
+  .chart-val{font-size:9px;top:-16px}
+  .chart-label{font-size:9px;margin-top:6px}
+  .kanban-card-actions{opacity:1}
+  .kanban-move-btn{padding:6px 12px;font-size:14px;background:var(--bg3)}
 }
 </style>
 </head>
 <body>
-
 <div class="shell" id="app-shell" style="display:none;">
   <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <aside class="sidebar">
     <div class="logo">
-      <div class="logo-mark">Umi<span>Desk</span></div>
-      <div class="logo-sub">sistema de gestão</div>
+      <div class="logo-mark">Umi<span>Desk</span></div><div class="logo-sub">sistema de gestão</div>
     </div>
     <nav class="nav">
       <div class="nav-section">Visão Geral</div>
@@ -185,9 +164,7 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
       <button class="nav-item" onclick="goPage('clientes',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-5 5-5s5 2 5 5"/><path d="M11 7c1.5 0 4 .8 4 4"/><circle cx="11" cy="4" r="2"/></svg>Clientes</button>
       <button class="nav-item" onclick="goPage('servicos',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M5 7h6M5 10h4"/></svg>Serviços</button>
     </nav>
-    <div class="sidebar-footer">
-      <button class="btn btn-ghost" style="width:100%; justify-content:center" id="btn-hide" onclick="toggleHideValues()">🙈 Ocultar Valores</button>
-    </div>
+    <div class="sidebar-footer"><button class="btn btn-ghost" style="width:100%;justify-content:center" id="btn-hide" onclick="toggleHideValues()">🙈 Ocultar Valores</button></div>
   </aside>
 
   <main class="main">
@@ -196,595 +173,348 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
       <button class="mobile-menu-btn" onclick="toggleSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
     </div>
     <div id="sync-status" class="sync-badge"><div class="sync-dot"></div>Sincronizado</div>
+    <div id="error-container" style="display:none;margin:32px 36px;padding:20px;background:rgba(255,92,92,0.1);border:1px solid var(--red);color:var(--text);border-radius:var(--radius);line-height:1.6"></div>
 
     <div class="page active" id="page-home">
-      <div class="page-header">
-        <div><div class="page-title-home" id="home-greeting">Olá 👋</div><div class="page-sub">Resumo da sua produtividade e tarefas.</div></div>
-        <button class="btn btn-accent" onclick="openDemandModal()">Nova Demanda</button>
-      </div>
+      <div class="page-header"><div><div class="page-title-home" id="home-greeting">Olá 👋</div><div class="page-sub">Resumo da sua produtividade e tarefas.</div></div><button class="btn btn-accent" onclick="openDemandModal()">Nova Demanda</button></div>
       <div class="stat-grid" id="home-prod-stats"></div>
       <div class="home-grid">
-        <div class="section-box">
-          <div class="section-box-head"><span class="section-box-title" style="font-weight:600">🎯 Foco do Dia</span><button class="btn btn-ghost btn-sm" onclick="goPage('kanban',document.querySelectorAll('.nav-item')[3])">Ir para Kanban →</button></div>
-          <div id="home-urgent-demands"></div>
-        </div>
-        <div class="section-box">
-          <div class="section-box-head"><span class="section-box-title" style="font-weight:600">🔜 Próximas</span></div>
-          <div id="home-next-demands"></div>
-        </div>
+        <div class="section-box"><div class="section-box-head"><span class="section-box-title" style="font-weight:600">🎯 Foco do Dia</span><button class="btn btn-ghost btn-sm" onclick="goPage('kanban',document.querySelectorAll('.nav-item')[3])">Ir para Kanban →</button></div><div id="home-urgent-demands"></div></div>
+        <div class="section-box"><div class="section-box-head"><span class="section-box-title" style="font-weight:600">🔜 Próximas</span></div><div id="home-next-demands"></div></div>
       </div>
     </div>
 
     <div class="page" id="page-calendario">
-      <div class="page-header">
-        <div><div class="page-title">Calendário Integrado</div><div class="page-sub">Visão geral da sua agenda. Adicione demandas usando o botão do Kanban!</div></div>
-      </div>
-      <div class="iframe-container">
-         <iframe src="https://calendar.google.com/calendar/embed?src=vsc.joaopedro%40gmail.com&ctz=America%2FFortaleza&bgcolor=%23181818&color=%23ff8a00&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0" style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
-      </div>
+      <div class="page-header"><div><div class="page-title">Calendário Integrado</div><div class="page-sub">Visão geral da sua agenda. Adicione demandas usando o botão do Kanban!</div></div></div>
+      <div class="iframe-container"><iframe src="https://calendar.google.com/calendar/embed?src=vsc.joaopedro%40gmail.com&ctz=America%2FFortaleza&bgcolor=%23181818&color=%23ff8a00&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0" style="border:0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe></div>
     </div>
 
     <div class="page" id="page-financeiro_dash">
-      <div class="page-header">
-        <div><div class="page-title">Visão Financeira</div><div class="page-sub">Seus resultados e métricas financeiras.</div></div>
-        <button class="btn btn-accent" onclick="openEntryModal()">Novo Lançamento</button>
-      </div>
+      <div class="page-header"><div><div class="page-title">Visão Financeira</div><div class="page-sub">Seus resultados e métricas financeiras.</div></div><button class="btn btn-accent" onclick="openEntryModal()">Novo Lançamento</button></div>
       <div class="stat-grid" id="home-stats"></div>
-      <div style="margin-bottom: 12px; font-size: 13px; font-weight: 500; color: var(--text2);">Receita dos últimos 6 meses</div>
+      <div style="margin-bottom:12px;font-size:13px;font-weight:500;color:var(--text2)">Receita dos últimos 6 meses</div>
       <div id="finance-chart"></div>
-      <div class="section-box">
-        <div class="section-box-head"><span class="section-box-title" style="font-weight:600">⚠️ Inadimplentes / A Receber (Mês Atual)</span><button class="btn btn-ghost btn-sm" onclick="goPage('clientes',document.querySelectorAll('.nav-item')[5])">Ver Clientes →</button></div>
-        <div id="home-receivables"></div>
-      </div>
+      <div class="section-box"><div class="section-box-head"><span class="section-box-title" style="font-weight:600">⚠️ Inadimplentes / A Receber (Mês Atual)</span><button class="btn btn-ghost btn-sm" onclick="goPage('clientes',document.querySelectorAll('.nav-item')[5])">Ver Clientes →</button></div><div id="home-receivables"></div></div>
     </div>
 
     <div class="page" id="page-kanban">
-      <div class="page-header">
-        <div><div class="page-title">Demandas</div><div class="page-sub">Acompanhe suas entregas. Atrasadas ou de hoje ganham destaque.</div></div>
-        <button class="btn btn-accent" onclick="openDemandModal()">Nova Demanda</button>
-      </div>
+      <div class="page-header"><div><div class="page-title">Demandas</div><div class="page-sub">Acompanhe suas entregas. Atrasadas ou de hoje ganham destaque.</div></div><button class="btn btn-accent" onclick="openDemandModal()">Nova Demanda</button></div>
       <div class="kanban-wrap" id="kanban-board"></div>
     </div>
 
     <div class="page" id="page-financeiro">
-      <div class="page-header">
-        <div><div class="page-title">Lançamentos Extras</div><div class="page-sub">Projetos avulsos ou extras fora da mensalidade.</div></div>
-        <button class="btn btn-accent" onclick="openEntryModal()">Novo Lançamento</button>
-      </div>
+      <div class="page-header"><div><div class="page-title">Lançamentos Extras</div><div class="page-sub">Projetos avulsos ou extras fora da mensalidade.</div></div><button class="btn btn-accent" onclick="openEntryModal()">Novo Lançamento</button></div>
       <div id="entries-table"></div>
     </div>
 
     <div class="page" id="page-clientes">
-      <div class="page-header">
-        <div><div class="page-title">Clientes & Mensalidades</div><div class="page-sub">Gerencie clientes ativos e o status de pagamento mensal.</div></div>
-        <button class="btn btn-accent" onclick="openClientModal()">Novo Cliente</button>
-      </div>
+      <div class="page-header"><div><div class="page-title">Clientes & Mensalidades</div><div class="page-sub">Gerencie clientes ativos e o status de pagamento mensal.</div></div><button class="btn btn-accent" onclick="openClientModal()">Novo Cliente</button></div>
       <div id="clients-list"></div>
     </div>
 
     <div class="page" id="page-servicos">
-      <div class="page-header">
-        <div><div class="page-title">Serviços</div><div class="page-sub">Catálogo de serviços e valores padrão.</div></div>
-        <button class="btn btn-accent" onclick="openServiceModal()">Novo Serviço</button>
-      </div>
+      <div class="page-header"><div><div class="page-title">Serviços</div><div class="page-sub">Catálogo de serviços e valores padrão.</div></div><button class="btn btn-accent" onclick="openServiceModal()">Novo Serviço</button></div>
       <div id="services-list"></div>
     </div>
   </main>
 </div>
 
-<div id="modal-container"></div>
-<div id="quick-modal-container"></div>
+<div id="modal-container"></div><div id="quick-modal-container"></div>
 
 <script>
-const BIN_ID = '69c5c9cfaa77b81da923335f';
-const API_KEY = '$2a$10$JoXBCMxsjxa4gCJ1SioEBOQ4JlNDa3VbQpbjWqzQch2Af.2bDQ9ae';
+const BIN_ID='69c5c9cfaa77b81da923335f';
+const API_KEY='$2a$10$JoXBCMxsjxa4gCJ1SioEBOQ4JlNDa3VbQpbjWqzQch2Af.2bDQ9ae';
+let S={user:{name:'Gestor'},clients:[],services:[],entries:[],demands:[],clientPrices:[],nextId:1};
 
-let S = { user: { name: 'Gestor' }, clients: [], services: [], entries: [], demands: [], clientPrices: [], nextId: 1 };
+function setSyncing(v){const b=document.getElementById('sync-status');if(b)b.innerHTML=v?'<div class="sync-dot" style="background:var(--yellow)"></div>Sincronizando...':'<div class="sync-dot"></div>Sincronizado';}
 
-function setSyncing(isSyncing) {
-  const badge = document.getElementById('sync-status');
-  if(badge) badge.innerHTML = isSyncing ? '<div class="sync-dot" style="background:var(--yellow)"></div>Sincronizando...' : '<div class="sync-dot"></div>Sincronizado';
-}
-
-async function loadData() {
+async function loadData(){
   setSyncing(true);
-  try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
-    if(res.ok) {
-      const data = await res.json();
-      const record = data.record;
-      if(record) { 
-        S.user = record.user || { name: 'Gestor' };
-        S.clients = record.clients || [];
-        S.services = record.services || [];
-        S.entries = record.entries || [];
-        S.demands = record.demands || [];
-        S.clientPrices = record.clientPrices || [];
-        S.nextId = record.nextId || 20;
+  try{
+    const res=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Master-Key':API_KEY}});
+    if(res.ok){
+      const data=await res.json();const rec=data.record||data;
+      if(rec){
+        S.user=rec.user||{name:'Gestor'};S.clients=Array.isArray(rec.clients)?rec.clients:[];S.services=Array.isArray(rec.services)?rec.services:[];
+        S.entries=Array.isArray(rec.entries)?rec.entries:[];S.demands=Array.isArray(rec.demands)?rec.demands:[];
+        S.clientPrices=Array.isArray(rec.clientPrices)?rec.clientPrices:[];S.nextId=rec.nextId||20;
       }
     }
-  } catch(e) {}
-  setSyncing(false);
-  goPage(currentPage);
+  }catch(e){console.error(e);}
+  if(S.clients.length===0&&S.services.length===0){
+    const old=localStorage.getItem('flhub');
+    if(old){try{const p=JSON.parse(old);if(p.clients&&p.clients.length>0){S.clients=p.clients;S.services=p.services||[];S.entries=p.entries||[];S.demands=p.demands||[];S.clientPrices=p.clientPrices||[];saveData();}}catch(e){}}
+  }
+  setSyncing(false);goPage(currentPage);
 }
 
-async function saveData() {
+async function saveData(){
   setSyncing(true);
-  try {
-    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY }, body: JSON.stringify(S)
-    });
-  } catch(e) {}
+  try{await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(S)});}catch(e){}
   setSyncing(false);
 }
 
-const uid = () => S.nextId++;
-const gc = id => S.clients.find(c=>c.id===id)||{name:'—',color:'#555', monthlyFee:0};
-const gs = id => S.services.find(s=>s.id===id)||{name:'—',price:0};
-const gd = id => S.demands.find(d=>d.id===id);
-const fmt = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const uid=()=>S.nextId++;
+const gc=id=>S.clients.find(c=>c.id===id)||{name:'—',color:'#555',monthlyFee:0};
+const gs=id=>S.services.find(s=>s.id===id)||{name:'—',price:0};
+const gd=id=>S.demands.find(d=>d.id===id);
+const fmt=v=>'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return 'Bom dia';
-  if (hour >= 12 && hour < 18) return 'Boa tarde';
-  return 'Boa noite';
+function getGreeting(){const h=new Date().getHours();return h>=5&&h<12?'Bom dia':h>=12&&h<18?'Boa tarde':'Boa noite';}
+function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.sidebar-overlay').classList.toggle('open');}
+let isValuesHidden=false;
+function toggleHideValues(){isValuesHidden=!isValuesHidden;document.body.classList.toggle('hide-values',isValuesHidden);document.getElementById('btn-hide').innerHTML=isValuesHidden?'👀 Mostrar Valores':'🙈 Ocultar Valores';}
+function getMonthKey(d=new Date()){return d.toISOString().slice(0,7);}
+function calcClientMonthData(clientId,m=getMonthKey()){
+  const c=gc(clientId);const pe=S.entries.filter(e=>e.clientId===clientId&&e.status==='recebido'&&(e.date||'').startsWith(m));
+  const pt=pe.reduce((s,e)=>s+((e.price||0)*(e.qty||1)),0);
+  const f=c.monthlyFee||0;let r=f-pt;if(r<0)r=0;
+  let st='Pendente';if(pt>0&&pt<f)st='Parcial';if(pt>=f&&f>0)st='Pago';if(f===0&&pt>0)st='Extra Pago';
+  return {fee:f,paidThisMonth:pt,remaining:r,status:st};
 }
 
-function toggleSidebar() {
-  document.querySelector('.sidebar').classList.toggle('open');
-  document.querySelector('.sidebar-overlay').classList.toggle('open');
-}
-
-let isValuesHidden = false;
-function toggleHideValues() {
-  isValuesHidden = !isValuesHidden;
-  document.body.classList.toggle('hide-values', isValuesHidden);
-  document.getElementById('btn-hide').innerHTML = isValuesHidden ? '👀 Mostrar Valores' : '🙈 Ocultar Valores';
-}
-
-function getMonthKey(dateObj = new Date()) { return dateObj.toISOString().slice(0,7); }
-
-function calcClientMonthData(clientId, monthKey = getMonthKey()) {
-  const c = gc(clientId);
-  const paidEntries = S.entries.filter(e => e.clientId === clientId && e.status === 'recebido' && (e.date||'').startsWith(monthKey));
-  const paidThisMonth = paidEntries.reduce((s,e) => s + ((e.price||0) * (e.qty||1)), 0);
-  const fee = c.monthlyFee || 0;
-  let remaining = fee - paidThisMonth;
-  if(remaining < 0) remaining = 0; 
-  let status = 'Pendente';
-  if (paidThisMonth > 0 && paidThisMonth < fee) status = 'Parcial';
-  if (paidThisMonth >= fee && fee > 0) status = 'Pago';
-  if (fee === 0 && paidThisMonth > 0) status = 'Extra Pago';
-  return { fee, paidThisMonth, remaining, status };
-}
-
-function exportToGoogleCalendar(id) {
-    const d = gd(id); if(!d) return;
-    const c = gc(d.clientId);
-    let title = encodeURIComponent(`Entrega: ${d.title} (${c.name})`);
-    let details = encodeURIComponent(`Cliente: ${c.name}\nStatus: ${d.status}\n\nGerado via UmiDesk`);
-    let dates = '';
-    if(d.due && d.due.includes('-')) {
-        const parts = d.due.split('-');
-        if(parts.length === 3) {
-            const dueObj = new Date(parts[0], parseInt(parts[1]) - 1, parts[2]);
-            dueObj.setDate(dueObj.getDate() + 1); 
-            const y2 = dueObj.getFullYear();
-            const m2 = String(dueObj.getMonth() + 1).padStart(2, '0');
-            const d2 = String(dueObj.getDate()).padStart(2, '0');
-            dates = `&dates=${d.due.replace(/-/g, '')}/${y2}${m2}${d2}`;
-        }
+function exportToGoogleCalendar(id){
+  const d=gd(id);if(!d)return;const c=gc(d.clientId);
+  let t=encodeURIComponent(`Entrega: ${d.title} (${c.name})`);let det=encodeURIComponent(`Cliente: ${c.name}\nStatus: ${d.status}\n\nGerado via UmiDesk`);let dt='';
+  if(d.due&&d.due.includes('-')){
+    const p=d.due.split('-');if(p.length===3){
+      const doObj=new Date(p[0],parseInt(p[1])-1,p[2]);doObj.setDate(doObj.getDate()+1);
+      dt=`&dates=${d.due.replace(/-/g,'')}/${doObj.getFullYear()}${String(doObj.getMonth()+1).padStart(2,'0')}${String(doObj.getDate()).padStart(2,'0')}`;
     }
-    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}${dates}`, '_blank');
+  }
+  window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${t}&details=${det}${dt}`,'_blank');
 }
 
-let currentPage = 'home';
-function goPage(name, el) {
-  currentPage = name;
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const pageEl = document.getElementById('page-'+name);
-  if(pageEl) pageEl.classList.add('active');
-  if(el) el.classList.add('active');
-  const sb = document.querySelector('.sidebar');
-  if(sb && sb.classList.contains('open')) toggleSidebar();
+let currentPage='home';
+function goPage(n,el){
+  currentPage=n;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  const pe=document.getElementById('page-'+n);if(pe)pe.classList.add('active');
+  if(el)el.classList.add('active');else{
+    const ns=document.querySelectorAll('.nav-item');
+    if(n==='home'&&ns[0])ns[0].classList.add('active');if(n==='financeiro_dash'&&ns[1])ns[1].classList.add('active');
+    if(n==='calendario'&&ns[2])ns[2].classList.add('active');if(n==='kanban'&&ns[3])ns[3].classList.add('active');
+    if(n==='financeiro'&&ns[4])ns[4].classList.add('active');if(n==='clientes'&&ns[5])ns[5].classList.add('active');
+    if(n==='servicos'&&ns[6])ns[6].classList.add('active');
+  }
+  const sb=document.querySelector('.sidebar');if(sb&&sb.classList.contains('open'))toggleSidebar();
   renderApp();
 }
 
-function renderApp() {
-  if(!S.clients) S.clients = [];
-  if(currentPage==='home') renderHomeProdutividade();
-  else if(currentPage==='financeiro_dash') renderFinanceiroDash();
-  else if(currentPage==='kanban') renderKanban();
-  else if(currentPage==='financeiro') renderFinanceiro();
-  else if(currentPage==='clientes') renderClientes();
-  else if(currentPage==='servicos') renderServicos();
+function renderApp(){
+  try{
+    S.clients=S.clients||[];S.services=S.services||[];S.entries=S.entries||[];S.demands=S.demands||[];
+    document.getElementById('error-container').style.display='none';
+    if(currentPage==='home')renderHomeProdutividade();else if(currentPage==='financeiro_dash')renderFinanceiroDash();
+    else if(currentPage==='kanban')renderKanban();else if(currentPage==='financeiro')renderFinanceiro();
+    else if(currentPage==='clientes')renderClientes();else if(currentPage==='servicos')renderServicos();
+  }catch(err){
+    document.getElementById('error-container').innerHTML=`<b>Falha ao exibir a tela:</b> ${err.message}<br>Seus dados podem estar corrompidos. Aperte Ctrl+F5 para limpar o cache.`;
+    document.getElementById('error-container').style.display='block';
+  }
 }
 
-function renderHomeProdutividade() {
-  const greetEl = document.getElementById('home-greeting');
-  if(greetEl) greetEl.innerHTML = `${getGreeting()} 👋`;
-  const now = new Date(); now.setHours(0,0,0,0);
-  let openDemands = S.demands.filter(d => d.status !== 'concluido').map(d => {
-    let diffDays = null;
-    if(d.due && d.due.includes('-')) {
-      const parts = d.due.split('-');
-      if(parts.length === 3) diffDays = Math.round((new Date(parts[0], parseInt(parts[1])-1, parts[2]) - now) / 86400000);
-    }
-    return {...d, diffDays};
+function renderHomeProdutividade(){
+  const ge=document.getElementById('home-greeting');if(ge)ge.innerHTML=`${getGreeting()} 👋`;
+  const now=new Date();now.setHours(0,0,0,0);
+  let od=S.demands.filter(d=>d.status!=='concluido').map(d=>{
+    let dd=null;if(d.due&&d.due.includes('-')){const p=d.due.split('-');if(p.length===3)dd=Math.round((new Date(p[0],parseInt(p[1])-1,p[2])-now)/86400000);}
+    return {...d,diffDays:dd};
   });
-  const atrasadas = openDemands.filter(d => d.diffDays !== null && d.diffDays < 0).length;
-  const venceHoje = openDemands.filter(d => d.diffDays === 0).length;
-  const emAndamento = S.demands.filter(d => d.status === 'em_andamento').length;
-  const revisao = S.demands.filter(d => d.status === 'revisao').length;
-
-  document.getElementById('home-prod-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Atrasadas</div><div class="stat-val ${atrasadas > 0 ? 'val-red' : ''}">${atrasadas}</div></div>
-    <div class="stat-card"><div class="stat-label">Vence Hoje</div><div class="stat-val ${venceHoje > 0 ? 'val-yellow' : ''}">${venceHoje}</div></div>
-    <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-val val-blue">${emAndamento}</div></div>
-    <div class="stat-card"><div class="stat-label">Aguard. Revisão</div><div class="stat-val" style="color:#ffd166">${revisao}</div></div>
-  `;
-
-  const urgentes = openDemands.filter(d => d.diffDays !== null && d.diffDays <= 0).sort((a,b) => a.diffDays - b.diffDays);
-  let urgHtml = '';
-  if(urgentes.length > 0) {
-    urgHtml += `<div class="table-wrap"><table><tbody>`;
-    urgentes.forEach(d => {
-      const flag = d.diffDays < 0 ? `<span class="badge badge-red">Atrasado (${Math.abs(d.diffDays)}d)</span>` : `<span class="badge badge-yellow">Vence Hoje</span>`;
-      urgHtml += `<tr style="cursor:pointer" onclick="openDemandModal(${d.id})">
-        <td style="padding:10px; border-bottom:1px solid var(--border)">
-          <div style="font-weight:500; font-size:13px">${d.title}</div><div style="margin-top:6px"><span class="chip"><span class="chip-dot" style="background:${gc(d.clientId).color}"></span>${gc(d.clientId).name}</span></div>
-        </td><td style="text-align:right; padding:10px; border-bottom:1px solid var(--border)">${flag}</td>
-      </tr>`;
-    });
-    urgHtml += `</tbody></table></div>`;
-  } else { urgHtml = `<div class="empty-state" style="padding:20px">Mandou bem! Nenhuma entrega atrasada ou para hoje.</div>`; }
-  document.getElementById('home-urgent-demands').innerHTML = urgHtml;
-
-  const proximas = openDemands.filter(d => d.diffDays !== null && d.diffDays > 0).sort((a,b) => a.diffDays - b.diffDays).slice(0, 5);
-  let proxHtml = '';
-  if(proximas.length > 0) {
-    proxHtml += `<div class="table-wrap"><table><tbody>`;
-    proximas.forEach(d => {
-      proxHtml += `<tr style="cursor:pointer" onclick="openDemandModal(${d.id})">
-        <td style="padding:10px; border-bottom:1px solid var(--border)">
-          <div style="font-weight:500">${d.title}</div><div style="margin-top:4px"><span class="chip"><span class="chip-dot" style="background:${gc(d.clientId).color}"></span>${gc(d.clientId).name}</span></div>
-        </td><td style="text-align:right; padding:10px; border-bottom:1px solid var(--border)"><span style="color:var(--text3); font-family:'DM Mono', monospace">em ${d.diffDays} dias</span></td>
-      </tr>`;
-    });
-    proxHtml += `</tbody></table></div>`;
-  } else { proxHtml = `<div class="empty-state" style="padding:20px">Nenhuma entrega com prazo futuro definida.</div>`; }
-  document.getElementById('home-next-demands').innerHTML = proxHtml;
+  const atr=od.filter(d=>d.diffDays!==null&&d.diffDays<0).length;const vh=od.filter(d=>d.diffDays===0).length;
+  const ea=S.demands.filter(d=>d.status==='em_andamento').length;const rev=S.demands.filter(d=>d.status==='revisao').length;
+  document.getElementById('home-prod-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Atrasadas</div><div class="stat-val ${atr>0?'val-red':''}">${atr}</div></div>
+    <div class="stat-card"><div class="stat-label">Vence Hoje</div><div class="stat-val ${vh>0?'val-yellow':''}">${vh}</div></div>
+    <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-val val-blue">${ea}</div></div>
+    <div class="stat-card"><div class="stat-label">Aguard. Revisão</div><div class="stat-val" style="color:#ffd166">${rev}</div></div>`;
+  const urg=od.filter(d=>d.diffDays!==null&&d.diffDays<=0).sort((a,b)=>a.diffDays-b.diffDays);
+  let uh='';if(urg.length>0){
+    uh+=`<div class="table-wrap"><table><tbody>`;
+    urg.forEach(d=>{const fl=d.diffDays<0?`<span class="badge badge-red">Atrasado (${Math.abs(d.diffDays)}d)</span>`:`<span class="badge badge-yellow">Vence Hoje</span>`;
+      uh+=`<tr style="cursor:pointer" onclick="openDemandModal(${d.id})"><td style="padding:10px;border-bottom:1px solid var(--border)"><div style="font-weight:500;font-size:13px">${d.title}</div><div style="margin-top:6px"><span class="chip"><span class="chip-dot" style="background:${gc(d.clientId).color}"></span>${gc(d.clientId).name}</span></div></td><td style="text-align:right;padding:10px;border-bottom:1px solid var(--border)">${fl}</td></tr>`;});
+    uh+=`</tbody></table></div>`;
+  }else{uh=`<div class="empty-state" style="padding:20px">Mandou bem! Nenhuma entrega atrasada.</div>`;}
+  document.getElementById('home-urgent-demands').innerHTML=uh;
+  const prox=od.filter(d=>d.diffDays!==null&&d.diffDays>0).sort((a,b)=>a.diffDays-b.diffDays).slice(0,5);
+  let ph='';if(prox.length>0){
+    ph+=`<div class="table-wrap"><table><tbody>`;
+    prox.forEach(d=>{ph+=`<tr style="cursor:pointer" onclick="openDemandModal(${d.id})"><td style="padding:10px;border-bottom:1px solid var(--border)"><div style="font-weight:500">${d.title}</div><div style="margin-top:4px"><span class="chip"><span class="chip-dot" style="background:${gc(d.clientId).color}"></span>${gc(d.clientId).name}</span></div></td><td style="text-align:right;padding:10px;border-bottom:1px solid var(--border)"><span style="color:var(--text3);font-family:'DM Mono',monospace">em ${d.diffDays} dias</span></td></tr>`;});
+    ph+=`</tbody></table></div>`;
+  }else{ph=`<div class="empty-state" style="padding:20px">Nenhuma entrega futura.</div>`;}
+  document.getElementById('home-next-demands').innerHTML=ph;
 }
 
-function renderFinanceiroDash() {
-  const currMonth = getMonthKey();
-  let lastMonthDate = new Date(); lastMonthDate.setMonth(lastMonthDate.getMonth()-1);
-  const lastMonth = getMonthKey(lastMonthDate);
-
-  let MRR = 0; let aReceberContratos = 0;
-  const pendentesAvulsos = S.entries.filter(e => e.status === 'pendente' && (e.date||'').startsWith(currMonth));
-  const aReceberAvulso = pendentesAvulsos.reduce((s, e) => s + ((e.price||0) * (e.qty||1)), 0);
-
-  S.clients.forEach(c => {
-    const data = calcClientMonthData(c.id, currMonth);
-    MRR += (c.monthlyFee || 0); aReceberContratos += data.remaining;
-  });
-
-  const totalReceberMes = aReceberContratos + aReceberAvulso;
-  const receitaMesAtual = S.entries.filter(e => e.status === 'recebido' && (e.date||'').startsWith(currMonth)).reduce((sum, e) => sum + ((e.price||0)*(e.qty||1)), 0);
-  const receitaMesPassado = S.entries.filter(e => e.status === 'recebido' && (e.date||'').startsWith(lastMonth)).reduce((sum, e) => sum + ((e.price||0)*(e.qty||1)), 0);
-  const variacao = receitaMesAtual - receitaMesPassado;
-
-  document.getElementById('home-stats').innerHTML = `
+function renderFinanceiroDash(){
+  const cm=getMonthKey();let lmD=new Date();lmD.setMonth(lmD.getMonth()-1);const lm=getMonthKey(lmD);
+  let MRR=0;let aRC=0;
+  const pA=S.entries.filter(e=>e.status==='pendente'&&(e.date||'').startsWith(cm));
+  const aRA=pA.reduce((s,e)=>s+((e.price||0)*(e.qty||1)),0);
+  S.clients.forEach(c=>{const d=calcClientMonthData(c.id,cm);MRR+=(c.monthlyFee||0);aRC+=d.remaining;});
+  const tRM=aRC+aRA;const rMA=S.entries.filter(e=>e.status==='recebido'&&(e.date||'').startsWith(cm)).reduce((s,e)=>s+((e.price||0)*(e.qty||1)),0);
+  const rMP=S.entries.filter(e=>e.status==='recebido'&&(e.date||'').startsWith(lm)).reduce((s,e)=>s+((e.price||0)*(e.qty||1)),0);
+  const v=rMA-rMP;
+  document.getElementById('home-stats').innerHTML=`
     <div class="stat-card"><div class="stat-label">MRR (Contratos)</div><div class="stat-val val-money val-accent">${fmt(MRR)}</div></div>
     <div class="stat-card"><div class="stat-label">Previsão Fixa Mês</div><div class="stat-val val-money">${fmt(MRR)}</div></div>
-    <div class="stat-card"><div class="stat-label">A Receber Total Mês</div><div class="stat-val val-money val-red">${fmt(totalReceberMes)}</div></div>
-    <div class="stat-card"><div class="stat-label">Receita do Mês</div><div class="stat-val val-money val-green">${fmt(receitaMesAtual)}</div></div>
-    <div class="stat-card"><div class="stat-label">Vs Mês Anterior</div><div class="stat-val val-money" style="color:${variacao >= 0 ? 'var(--green)' : 'var(--red)'}">${variacao >= 0 ? '+' : '-'}${fmt(Math.abs(variacao))}</div></div>
-    <div class="stat-card"><div class="stat-label">Extras Pendentes</div><div class="stat-val val-yellow">${pendentesAvulsos.length}</div></div>
-  `;
-
-  let aReceberHtml = '';
-  const mapDevedores = {};
-  S.clients.forEach(c => { const d = calcClientMonthData(c.id, currMonth); if(d.remaining > 0) mapDevedores[c.id] = { c, total: d.remaining }; });
-  pendentesAvulsos.forEach(e => { if(!mapDevedores[e.clientId]) mapDevedores[e.clientId] = { c: gc(e.clientId), total: 0 }; mapDevedores[e.clientId].total += ((e.price||0) * (e.qty||1)); });
-  const clientsPendent = Object.values(mapDevedores).sort((a,b) => b.total - a.total);
-
-  if(clientsPendent.length > 0) {
-    aReceberHtml += `<div class="table-wrap"><table><tbody>`;
-    clientsPendent.forEach(item => {
-      aReceberHtml += `<tr>
-        <td style="padding:10px; border-bottom:1px solid var(--border)"><span class="chip"><span class="chip-dot" style="background:${item.c.color}"></span>${item.c.name}</span></td>
-        <td class="val-money val-red" style="text-align:right; font-family:'DM Mono',monospace; padding:10px; border-bottom:1px solid var(--border)">${fmt(item.total)}</td>
-      </tr>`;
-    });
-    aReceberHtml += `</tbody></table></div>`;
-  } else { aReceberHtml = `<div class="empty-state" style="padding:20px">Nada a receber neste mês. Tudo pago!</div>`; }
-  document.getElementById('home-receivables').innerHTML = aReceberHtml;
-
-  const el = document.getElementById('finance-chart');
-  if(el) {
-    const meses = []; const valores = [];
-    for (let i = 5; i >= 0; i--) {
-        let d = new Date(); d.setMonth(d.getMonth() - i);
-        meses.push(d.toLocaleString('pt-BR', { month: 'short' }).replace('.','').toUpperCase());
-        valores.push(S.entries.filter(e => e.status === 'recebido' && (e.date||'').startsWith(getMonthKey(d))).reduce((s, e) => s + ((e.price||0) * (e.qty||1)), 0));
-    }
-    const maxVal = Math.max(...valores, 100); 
-    let html = `<div class="chart-container">`;
-    for(let i=0; i < 6; i++) {
-        html += `<div class="chart-col"><div class="chart-val val-money">${valores[i] > 0 ? 'R$ '+valores[i] : ''}</div><div class="chart-bar" style="height: ${Math.max(5, (valores[i] / maxVal) * 100)}%"></div><div class="chart-label">${meses[i]}</div></div>`;
-    }
-    el.innerHTML = html + `</div>`;
+    <div class="stat-card"><div class="stat-label">A Receber Total Mês</div><div class="stat-val val-money val-red">${fmt(tRM)}</div></div>
+    <div class="stat-card"><div class="stat-label">Receita do Mês</div><div class="stat-val val-money val-green">${fmt(rMA)}</div></div>
+    <div class="stat-card"><div class="stat-label">Vs Mês Anterior</div><div class="stat-val val-money" style="color:${v>=0?'var(--green)':'var(--red)'}">${v>=0?'+':'-'}${fmt(Math.abs(v))}</div></div>
+    <div class="stat-card"><div class="stat-label">Extras Pendentes</div><div class="stat-val val-yellow">${pA.length}</div></div>`;
+  let aRH='';const mD={};
+  S.clients.forEach(c=>{const d=calcClientMonthData(c.id,cm);if(d.remaining>0)mD[c.id]={c,total:d.remaining};});
+  pA.forEach(e=>{if(!mD[e.clientId])mD[e.clientId]={c:gc(e.clientId),total:0};mD[e.clientId].total+=((e.price||0)*(e.qty||1));});
+  const cP=Object.values(mD).sort((a,b)=>b.total-a.total);
+  if(cP.length>0){aRH+=`<div class="table-wrap"><table><tbody>`;cP.forEach(i=>{aRH+=`<tr><td style="padding:10px;border-bottom:1px solid var(--border)"><span class="chip"><span class="chip-dot" style="background:${i.c.color}"></span>${i.c.name}</span></td><td class="val-money val-red" style="text-align:right;font-family:'DM Mono',monospace;padding:10px;border-bottom:1px solid var(--border)">${fmt(i.total)}</td></tr>`;});aRH+=`</tbody></table></div>`;}
+  else{aRH=`<div class="empty-state" style="padding:20px">Tudo pago!</div>`;}
+  document.getElementById('home-receivables').innerHTML=aRH;
+  const el=document.getElementById('finance-chart');
+  if(el){
+    const ms=[];const vs=[];
+    for(let i=5;i>=0;i--){let d=new Date();d.setMonth(d.getMonth()-i);ms.push(d.toLocaleString('pt-BR',{month:'short'}).replace('.','').toUpperCase());vs.push(S.entries.filter(e=>e.status==='recebido'&&(e.date||'').startsWith(getMonthKey(d))).reduce((s,e)=>s+((e.price||0)*(e.qty||1)),0));}
+    const mx=Math.max(...vs,100);let h=`<div class="chart-container">`;
+    for(let i=0;i<6;i++){h+=`<div class="chart-col"><div class="chart-val val-money">${vs[i]>0?'R$ '+vs[i]:''}</div><div class="chart-bar" style="height:${Math.max(5,(vs[i]/mx)*100)}%"></div><div class="chart-label">${ms[i]}</div></div>`;}
+    el.innerHTML=h+`</div>`;
   }
 }
 
-const COLS = [{key:'a_fazer',label:'A Fazer',color:'#555'},{key:'em_andamento',label:'Em Andamento',color:'#5c9eff'},{key:'revisao',label:'Revisão',color:'#ffd166'},{key:'concluido',label:'Concluído',color:'#5cffa0'}];
-function renderKanban() {
-  const board = document.getElementById('kanban-board');
-  const now = new Date(); now.setHours(0,0,0,0);
-  let openDemands = S.demands.map(d => {
-    let diffDays = null;
-    if(d.due && d.due.includes('-')) {
-      const p = d.due.split('-'); if(p.length===3) diffDays = Math.round((new Date(p[0], parseInt(p[1])-1, p[2]) - now) / 86400000);
-    }
-    return {...d, diffDays};
-  }).sort((a,b) => (a.diffDays === null ? 999 : a.diffDays) - (b.diffDays === null ? 999 : b.diffDays));
-
-  board.innerHTML = COLS.map((col, colIdx) => {
-    const cards = openDemands.filter(d=>d.status===col.key);
-    return `<div class="kanban-col">
-      <div class="kanban-col-head"><span class="kanban-col-title"><span class="kanban-col-dot" style="background:${col.color}"></span>${col.label}</span><span class="badge badge-gray">${cards.length}</span></div>
-      <div class="kanban-cards">
-        ${cards.map(d => {
-          let dateLabel = ''; let ext = '';
-          if(d.diffDays !== null && d.status !== 'concluido') {
-            if(d.diffDays < 0) { ext='atrasado'; dateLabel=`<span style="color:var(--red)">Atrasado ${Math.abs(d.diffDays)}d</span>`; }
-            else if(d.diffDays === 0) { ext='hoje'; dateLabel=`<span style="color:var(--yellow)">Vence Hoje</span>`; }
-            else { dateLabel = `em ${d.diffDays}d`; }
-          }
-          return `<div class="kanban-card ${ext}" onclick="openDemandModal(${d.id})">
-            <div class="kanban-card-title">${d.title}</div>
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px"><span class="chip"><span class="chip-dot" style="background:${gc(d.clientId).color}"></span>${gc(d.clientId).name}</span></div>
-            <div class="kanban-card-footer" onclick="event.stopPropagation()">
-              <span style="font-family:'DM Mono',monospace">${dateLabel}</span>
-              <div class="kanban-card-actions">
-                ${colIdx>0 ? `<button class="kanban-move-btn" onclick="moveDemand(${d.id}, -1)">←</button>` : ''}
-                ${colIdx<COLS.length-1 ? `<button class="kanban-move-btn" onclick="moveDemand(${d.id}, 1)">→</button>` : ''}
-              </div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div></div>`;
+const COLS=[{key:'a_fazer',label:'A Fazer',color:'#555'},{key:'em_andamento',label:'Em Andamento',color:'#5c9eff'},{key:'revisao',label:'Revisão',color:'#ffd166'},{key:'concluido',label:'Concluído',color:'#5cffa0'}];
+function renderKanban(){
+  const b=document.getElementById('kanban-board');const now=new Date();now.setHours(0,0,0,0);
+  let od=S.demands.map(d=>{let dd=null;if(d.due&&d.due.includes('-')){const p=d.due.split('-');if(p.length===3)dd=Math.round((new Date(p[0],parseInt(p[1])-1,p[2])-now)/86400000);}return {...d,diffDays:dd};}).sort((a,b)=>(a.diffDays===null?999:a.diffDays)-(b.diffDays===null?999:b.diffDays));
+  b.innerHTML=COLS.map((col,ci)=>{
+    const cds=od.filter(d=>d.status===col.key);
+    return `<div class="kanban-col"><div class="kanban-col-head"><span class="kanban-col-title"><span class="kanban-col-dot" style="background:${col.color}"></span>${col.label}</span><span class="badge badge-gray">${cds.length}</span></div><div class="kanban-cards">
+      ${cds.map(d=>{
+        let dl='';let ext='';if(d.diffDays!==null&&d.status!=='concluido'){if(d.diffDays<0){ext='atrasado';dl=`<span style="color:var(--red)">Atrasado ${Math.abs(d.diffDays)}d</span>`;}else if(d.diffDays===0){ext='hoje';dl=`<span style="color:var(--yellow)">Vence Hoje</span>`;}else{dl=`em ${d.diffDays}d`;}}
+        return `<div class="kanban-card ${ext}" onclick="openDemandModal(${d.id})"><div class="kanban-card-title">${d.title}</div><div style="display:flex;justify-content:space-between;align-items:center;font-size:11px"><span class="chip"><span class="chip-dot" style="background:${gc(d.clientId).color}"></span>${gc(d.clientId).name}</span></div><div class="kanban-card-footer" onclick="event.stopPropagation()"><span style="font-family:'DM Mono',monospace">${dl}</span><div class="kanban-card-actions">${ci>0?`<button class="kanban-move-btn" onclick="moveDemand(${d.id},-1)">←</button>`:''}${ci<COLS.length-1?`<button class="kanban-move-btn" onclick="moveDemand(${d.id},1)">→</button>`:''}</div></div></div>`;
+      }).join('')}</div></div>`;
   }).join('');
 }
-function moveDemand(id, dir) { const d = gd(id); if(d) { d.status = COLS[COLS.findIndex(c=>c.key===d.status)+dir].key; saveData(); renderApp(); } }
+function moveDemand(id,dir){const d=gd(id);if(d){d.status=COLS[COLS.findIndex(c=>c.key===d.status)+dir].key;saveData();renderApp();}}
 
-function renderClientes() {
-  const el = document.getElementById('clients-list');
-  if(!S.clients.length) { el.innerHTML='<div class="empty-state">Nenhum cliente cadastrado.</div>'; return; }
-  const currMonth = getMonthKey();
-  let html = `<div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Valor Mensal</th><th>Pago no Mês</th><th>Restante (Mês)</th><th>Status Mês</th><th>Ações</th></tr></thead><tbody>`;
-  S.clients.forEach(c => {
-    const data = calcClientMonthData(c.id, currMonth);
-    const badgeClass = data.status === 'Pago' || data.status === 'Extra Pago' ? 'badge-green' : (data.status === 'Parcial' ? 'badge-yellow' : 'badge-red');
-    html += `<tr>
-      <td><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></td>
-      <td class="val-money" style="font-family:'DM Mono',monospace">${fmt(c.monthlyFee)}</td>
-      <td class="val-money val-green" style="font-family:'DM Mono',monospace">${fmt(data.paidThisMonth)}</td>
-      <td class="val-money" style="font-family:'DM Mono',monospace; color:${data.remaining > 0 ? 'var(--red)' : 'var(--text3)'}">${fmt(data.remaining)}</td>
-      <td><span class="badge ${badgeClass}">${data.status}</span></td>
-      <td style="display:flex; gap:6px; flex-wrap: wrap;">
-        ${data.remaining > 0 ? `<button class="btn btn-sm btn-accent" style="color:var(--bg)" onclick="payMonthlyFee(${c.id})">Baixar Mês</button>` : ''}
-        <button class="btn btn-sm btn-ghost" onclick="openClientModal(${c.id})">Editar</button>
-        <button class="btn btn-sm btn-danger" onclick="confirmAction('Remover cliente?', () => deleteClient(${c.id}))">Excluir</button>
-      </td>
-    </tr>`;
-  });
-  el.innerHTML = html + `</tbody></table></div>`;
+function renderClientes(){
+  const el=document.getElementById('clients-list');if(!S.clients.length){el.innerHTML='<div class="empty-state">Nenhum cliente.</div>';return;}
+  const cm=getMonthKey();let h=`<div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Valor Mensal</th><th>Pago no Mês</th><th>Restante (Mês)</th><th>Status Mês</th><th>Ações</th></tr></thead><tbody>`;
+  S.clients.forEach(c=>{
+    const d=calcClientMonthData(c.id,cm);const bc=d.status==='Pago'||d.status==='Extra Pago'?'badge-green':(d.status==='Parcial'?'badge-yellow':'badge-red');
+    h+=`<tr><td><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></td><td class="val-money" style="font-family:'DM Mono',monospace">${fmt(c.monthlyFee||0)}</td><td class="val-money val-green" style="font-family:'DM Mono',monospace">${fmt(d.paidThisMonth)}</td><td class="val-money" style="font-family:'DM Mono',monospace;color:${d.remaining>0?'var(--red)':'var(--text3)'}">${fmt(d.remaining)}</td><td><span class="badge ${bc}">${d.status}</span></td><td style="display:flex;gap:6px;flex-wrap:wrap;">${d.remaining>0?`<button class="btn btn-sm btn-accent" style="color:var(--bg)" onclick="payMonthlyFee(${c.id})">Baixar Mês</button>`:''}<button class="btn btn-sm btn-ghost" onclick="openClientModal(${c.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="confirmAction('Remover cliente?',()=>deleteClient(${c.id}))">Excluir</button></td></tr>`;
+  });el.innerHTML=h+`</tbody></table></div>`;
 }
-
-function openClientModal(id = null) {
-  const c = id ? gc(id) : null;
-  showModal(`
-    <div class="modal-header"><div class="modal-title">${c ? 'Editar Cliente' : 'Novo Cliente'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div>
-    <div class="form-row form-row-2">
-      <div class="form-group"><label>Nome</label><input id="cl-name" value="${c ? c.name : ''}"></div>
-      <div class="form-group"><label>Cor</label><input type="color" id="cl-color" value="${c ? c.color : '#ff8a00'}" style="height:38px; padding:2px"></div>
-    </div>
-    <div class="form-group"><label>Valor Mensal (R$)</label><input type="number" id="cl-fee" value="${c ? (c.monthlyFee||0) : 0}" step="0.01"></div>
-    <div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveClient(${c ? c.id : 'null'})">Salvar</button></div>
-  `);
-  setTimeout(()=>document.getElementById('cl-name').focus(), 100);
+function openClientModal(id=null){
+  const c=id?gc(id):null;
+  showModal(`<div class="modal-header"><div class="modal-title">${c?'Editar Cliente':'Novo Cliente'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-row form-row-2"><div class="form-group"><label>Nome</label><input id="cl-name" value="${c?c.name:''}"></div><div class="form-group"><label>Cor</label><input type="color" id="cl-color" value="${c?c.color:'#ff8a00'}" style="height:38px;padding:2px"></div></div><div class="form-group"><label>Valor Mensal (R$)</label><input type="number" id="cl-fee" value="${c?(c.monthlyFee||0):0}" step="0.01"></div><div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveClient(${c?c.id:'null'})">Salvar</button></div>`);
+  setTimeout(()=>document.getElementById('cl-name').focus(),100);
 }
-function saveClient(id) {
-  const name = document.getElementById('cl-name').value.trim();
-  if(!name) return;
-  if(id !== 'null') { const c = gc(parseInt(id)); Object.assign(c, {name, color: document.getElementById('cl-color').value, monthlyFee: parseFloat(document.getElementById('cl-fee').value)||0}); }
-  else { S.clients.push({ id: uid(), name, color: document.getElementById('cl-color').value, monthlyFee: parseFloat(document.getElementById('cl-fee').value)||0 }); }
-  saveData(); closeModal(); renderApp();
+function saveClient(id){
+  const n=document.getElementById('cl-name').value.trim();if(!n)return;
+  if(id!=='null')Object.assign(gc(parseInt(id)),{name:n,color:document.getElementById('cl-color').value,monthlyFee:parseFloat(document.getElementById('cl-fee').value)||0});
+  else S.clients.push({id:uid(),name:n,color:document.getElementById('cl-color').value,monthlyFee:parseFloat(document.getElementById('cl-fee').value)||0});
+  saveData();closeModal();renderApp();
 }
-function deleteClient(id) { S.clients = S.clients.filter(c=>c.id!==id); S.entries = S.entries.filter(e=>e.clientId!==id); S.demands = S.demands.filter(d=>d.clientId!==id); saveData(); renderApp(); }
-
-function payMonthlyFee(clientId) {
-  const c = gc(clientId); const data = calcClientMonthData(clientId);
-  if(data.remaining > 0) {
-      let svc = S.services.find(s => s.name === 'Mensalidade');
-      if(!svc) { svc = { id: uid(), name: 'Mensalidade', price: 0 }; S.services.push(svc); }
-      openEntryModal(null, { clientId, serviceId: svc.id, qty: 1, price: data.remaining, status: 'recebido', date: new Date().toISOString().split('T')[0], desc: 'Ref. Mensalidade' });
+function deleteClient(id){S.clients=S.clients.filter(c=>c.id!==id);S.entries=S.entries.filter(e=>e.clientId!==id);S.demands=S.demands.filter(d=>d.clientId!==id);saveData();renderApp();}
+function payMonthlyFee(cid){
+  const d=calcClientMonthData(cid);if(d.remaining>0){
+    let s=S.services.find(x=>x.name==='Mensalidade');if(!s){s={id:uid(),name:'Mensalidade',price:0};S.services.push(s);}
+    openEntryModal(null,{clientId:cid,serviceId:s.id,qty:1,price:d.remaining,status:'recebido',date:new Date().toISOString().split('T')[0],desc:'Ref. Mensalidade'});
   }
 }
-function openQuickClientModal() {
-  document.getElementById('quick-modal-container').innerHTML = `
-    <div class="modal-overlay-quick"><div class="modal modal-sm">
-        <div class="modal-header"><div class="modal-title">Novo Cliente Rápido</div></div>
-        <div class="form-group"><label>Nome</label><input id="quick-cl-name"></div>
-        <div class="modal-footer"><button class="btn" onclick="document.getElementById('quick-modal-container').innerHTML=''">Cancelar</button><button class="btn btn-accent" onclick="saveQuickClient()">Criar</button></div>
-      </div></div>`;
-  setTimeout(()=>document.getElementById('quick-cl-name').focus(), 100);
+function openQuickClientModal(){
+  document.getElementById('quick-modal-container').innerHTML=`<div class="modal-overlay-quick"><div class="modal modal-sm"><div class="modal-header"><div class="modal-title">Novo Cliente Rápido</div></div><div class="form-group"><label>Nome</label><input id="quick-cl-name"></div><div class="modal-footer"><button class="btn" onclick="document.getElementById('quick-modal-container').innerHTML=''">Cancelar</button><button class="btn btn-accent" onclick="saveQuickClient()">Criar</button></div></div></div>`;
+  setTimeout(()=>document.getElementById('quick-cl-name').focus(),100);
 }
-function saveQuickClient() {
-  const name = document.getElementById('quick-cl-name').value.trim();
-  if(!name) return;
-  const newClient = { id: uid(), name, color: '#ff8a00', monthlyFee: 0 };
-  S.clients.push(newClient); saveData();
-  const dm = document.getElementById('dm-client'); if(dm) { dm.innerHTML += `<option value="${newClient.id}">${newClient.name}</option>`; dm.value = newClient.id; }
-  const en = document.getElementById('en-client'); if(en) { en.innerHTML += `<option value="${newClient.id}">${newClient.name}</option>`; en.value = newClient.id; }
-  document.getElementById('quick-modal-container').innerHTML = '';
+function saveQuickClient(){
+  const n=document.getElementById('quick-cl-name').value.trim();if(!n)return;
+  const nc={id:uid(),name:n,color:'#ff8a00',monthlyFee:0};S.clients.push(nc);saveData();
+  const dm=document.getElementById('dm-client');if(dm){dm.innerHTML+=`<option value="${nc.id}">${nc.name}</option>`;dm.value=nc.id;}
+  const en=document.getElementById('en-client');if(en){en.innerHTML+=`<option value="${nc.id}">${nc.name}</option>`;en.value=nc.id;}
+  document.getElementById('quick-modal-container').innerHTML='';
 }
 
-function renderFinanceiro() {
-  const el = document.getElementById('entries-table');
-  if(!S.entries.length) { el.innerHTML='<div class="empty-state">Nenhum lançamento.</div>'; return; }
-  const sorted = [...S.entries].sort((a,b) => (b.date||'').localeCompare(a.date||''));
-  let html = `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
-  sorted.forEach(e => {
-    html += `<tr>
-      <td style="font-family:'DM Mono',monospace">${e.date && e.date.includes('-') ? e.date.split('-').reverse().join('/') : e.date}</td>
-      <td><span class="chip"><span class="chip-dot" style="background:${gc(e.clientId).color}"></span>${gc(e.clientId).name}</span></td>
-      <td>${gs(e.serviceId).name} ${e.qty>1?`<span style="color:var(--text3);font-size:11px">x${e.qty}</span>`:''} ${e.desc?`<span style="color:var(--text3)">— ${e.desc}</span>`:''}</td>
-      <td class="val-money" style="font-family:'DM Mono',monospace; font-weight:500">${fmt((e.price||0)*(e.qty||1))}</td>
-      <td><span class="badge ${e.status==='recebido'?'badge-green':'badge-yellow'}" style="cursor:pointer" onclick="toggleEntryStatus(${e.id})">${(e.status||'').toUpperCase()}</span></td>
-      <td style="display:flex; gap:6px; flex-wrap: wrap;"><button class="btn btn-sm btn-ghost" onclick="openEntryModal(${e.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="deleteEntry(${e.id})">✕</button></td>
-    </tr>`;
-  });
-  el.innerHTML = html + `</tbody></table></div>`;
+function renderFinanceiro(){
+  const el=document.getElementById('entries-table');if(!S.entries.length){el.innerHTML='<div class="empty-state">Nenhum lançamento.</div>';return;}
+  const s=[...S.entries].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  let h=`<div class="table-wrap"><table><thead><tr><th>Data</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
+  s.forEach(e=>{
+    h+=`<tr><td style="font-family:'DM Mono',monospace">${e.date&&e.date.includes('-')?e.date.split('-').reverse().join('/'):e.date}</td><td><span class="chip"><span class="chip-dot" style="background:${gc(e.clientId).color}"></span>${gc(e.clientId).name}</span></td><td>${gs(e.serviceId).name} ${e.qty>1?`<span style="color:var(--text3);font-size:11px">x${e.qty}</span>`:''} ${e.desc?`<span style="color:var(--text3)">— ${e.desc}</span>`:''}</td><td class="val-money" style="font-family:'DM Mono',monospace;font-weight:500">${fmt((e.price||0)*(e.qty||1))}</td><td><span class="badge ${e.status==='recebido'?'badge-green':'badge-yellow'}" style="cursor:pointer" onclick="toggleEntryStatus(${e.id})">${(e.status||'').toUpperCase()}</span></td><td style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-sm btn-ghost" onclick="openEntryModal(${e.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="deleteEntry(${e.id})">✕</button></td></tr>`;
+  });el.innerHTML=h+`</tbody></table></div>`;
+}
+function openEntryModal(id=null,pf=null){
+  const e=id?S.entries.find(x=>x.id===id):pf;
+  const co=S.clients.map(c=>`<option value="${c.id}" ${e&&e.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
+  const so=S.services.map(s=>`<option value="${s.id}" ${e&&e.serviceId===s.id?'selected':''}>${s.name}</option>`).join('');
+  showModal(`<div class="modal-header"><div class="modal-title">${id?'Editar Lançamento':'Novo Lançamento'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-row form-row-2"><div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="en-client" style="flex:1" onchange="fillPrice()">${co}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div><div class="form-group"><label>Serviço</label><select id="en-service" onchange="fillPrice()">${so}</select></div></div><div class="form-row form-row-3"><div class="form-group"><label>Valor unit. (R$)</label><input type="number" id="en-price" value="${e?e.price:''}"></div><div class="form-group"><label>Quantidade</label><input type="number" id="en-qty" value="${e?e.qty:1}"></div><div class="form-group"><label>Status</label><select id="en-status"><option value="pendente" ${e&&e.status==='pendente'?'selected':''}>Pendente</option><option value="recebido" ${e&&e.status==='recebido'?'selected':''}>Recebido</option></select></div></div><div class="form-row form-row-2"><div class="form-group"><label>Data Referência</label><input type="date" id="en-date" value="${e&&e.date?e.date:new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label>Descrição Curta</label><input type="text" id="en-desc" value="${e&&e.desc?e.desc:''}"></div></div><div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveEntry(${id?id:'null'})">Salvar</button></div>`);
+  if(!e)fillPrice();
+}
+function fillPrice(){const el=document.getElementById('en-price');if(el&&document.getElementById('en-service'))el.value=gs(parseInt(document.getElementById('en-service').value)).price;}
+function saveEntry(id){
+  const p={clientId:parseInt(document.getElementById('en-client').value),serviceId:parseInt(document.getElementById('en-service').value),price:parseFloat(document.getElementById('en-price').value)||0,qty:parseInt(document.getElementById('en-qty').value)||1,status:document.getElementById('en-status').value,date:document.getElementById('en-date').value,desc:document.getElementById('en-desc').value.trim()};
+  if(id!=='null')Object.assign(S.entries.find(x=>x.id===parseInt(id)),p);else S.entries.push({id:uid(),...p});
+  saveData();closeModal();renderApp();
+}
+function toggleEntryStatus(id){const e=S.entries.find(x=>x.id===id);if(e){e.status=e.status==='recebido'?'pendente':'recebido';saveData();renderApp();}}
+function deleteEntry(id){if(confirm('Remover lançamento?')){S.entries=S.entries.filter(e=>e.id!==id);saveData();renderApp();}}
+
+function openDemandModal(id=null){
+  const d=id?gd(id):null;
+  const co=S.clients.map(c=>`<option value="${c.id}" ${d&&d.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
+  const so=COLS.map(c=>`<option value="${c.key}" ${d&&d.status===c.key?'selected':''}>${c.label}</option>`).join('');
+  showModal(`<div class="modal-header"><div class="modal-title">${d?'Editar Demanda':'Nova Demanda'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-group"><label>Título</label><input id="dm-title" value="${d?d.title:''}"></div><div class="form-row form-row-2"><div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="dm-client" style="flex:1">${co}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div><div class="form-group"><label>Status</label><select id="dm-status">${so}</select></div></div><div class="form-group"><label>Prazo</label><input type="date" id="dm-due" value="${d&&d.due?d.due:''}"></div><div class="modal-footer" style="justify-content:space-between;"><div style="display:flex;gap:8px;width:100%;justify-content:flex-start;">${d?`<button class="btn btn-danger" onclick="confirmAction('Excluir?',()=>deleteDemand(${d.id}))">Excluir</button>`:''}${d&&d.due?`<button class="btn btn-ghost" style="color:var(--blue)" onclick="exportToGoogleCalendar(${d.id})">📅 Agenda</button>`:''}</div><div style="display:flex;gap:8px;width:100%;justify-content:flex-end;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveDemand(${d?d.id:'null'})">Salvar</button></div></div>`);
+  setTimeout(()=>document.getElementById('dm-title').focus(),100);
+}
+function saveDemand(id){
+  const t=document.getElementById('dm-title').value.trim();if(!t)return;
+  const p={title:t,clientId:parseInt(document.getElementById('dm-client').value),status:document.getElementById('dm-status').value,due:document.getElementById('dm-due').value};
+  if(id!=='null')Object.assign(gd(parseInt(id)),p);else S.demands.push({id:uid(),...p});
+  saveData();closeModal();renderApp();
+}
+function deleteDemand(id){S.demands=S.demands.filter(d=>d.id!==id);saveData();closeModal();renderApp();}
+
+function renderServicos(){
+  document.getElementById('services-list').innerHTML=`<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Preço Padrão</th><th>Ações</th></tr></thead><tbody>${S.services.map(s=>`<tr><td>${s.name}</td><td class="val-money" style="font-family:'DM Mono',monospace">${fmt(s.price)}</td><td style="display:flex;gap:6px;"><button class="btn btn-sm btn-ghost" onclick="openServiceModal(${s.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="confirmAction('Remover?',()=>deleteService(${s.id}))">Excluir</button></td></tr>`).join('')}</tbody></table></div>`;
+}
+function openServiceModal(id=null){
+  const s=id?gs(id):null;
+  showModal(`<div class="modal-header"><div class="modal-title">${s?'Editar Serviço':'Novo Serviço'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-row form-row-2"><div class="form-group"><label>Nome</label><input id="sv-name" value="${s?s.name:''}"></div><div class="form-group"><label>Preço Padrão (R$)</label><input type="number" id="sv-price" value="${s?s.price:''}"></div></div><div class="modal-footer"><div style="width:100%;display:flex;justify-content:flex-end;gap:8px;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveService(${s?s.id:'null'})">Salvar</button></div></div>`);
+}
+function saveService(id){
+  const n=document.getElementById('sv-name').value.trim();if(!n)return;
+  if(id!=='null')Object.assign(gs(parseInt(id)),{name:n,price:parseFloat(document.getElementById('sv-price').value)||0});
+  else S.services.push({id:uid(),name:n,price:parseFloat(document.getElementById('sv-price').value)||0});
+  saveData();closeModal();renderApp();
+}
+function deleteService(id){S.services=S.services.filter(s=>s.id!==id);saveData();renderApp();}
+
+function showModal(h){document.getElementById('modal-container').innerHTML=`<div class="modal-overlay" onmousedown="if(event.target===this)closeModal()"><div class="modal">${h}</div></div>`;}
+function closeModal(){document.getElementById('modal-container').innerHTML='';}
+let pendingConfirmAction=null;
+function confirmAction(m,f){
+  pendingConfirmAction=f;
+  showModal(`<div class="modal-header"><div class="modal-title">Atenção</div></div><p style="font-size:14px;margin-bottom:20px">${m}</p><div class="modal-footer"><div style="width:100%;display:flex;justify-content:flex-end;gap:8px;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-danger" onclick="closeModal();if(pendingConfirmAction)pendingConfirmAction();pendingConfirmAction=null;">Confirmar Exclusão</button></div></div>`);
 }
 
-function openEntryModal(id = null, prefill = null) {
-  const e = id ? S.entries.find(x=>x.id===id) : prefill;
-  const clientOpts = S.clients.map(c=>`<option value="${c.id}" ${e&&e.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
-  const serviceOpts = S.services.map(s=>`<option value="${s.id}" ${e&&e.serviceId===s.id?'selected':''}>${s.name}</option>`).join('');
-  showModal(`
-    <div class="modal-header"><div class="modal-title">${id ? 'Editar Lançamento' : 'Novo Lançamento'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div>
-    <div class="form-row form-row-2">
-      <div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="en-client" style="flex:1" onchange="fillPrice()">${clientOpts}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div>
-      <div class="form-group"><label>Serviço</label><select id="en-service" onchange="fillPrice()">${serviceOpts}</select></div>
-    </div>
-    <div class="form-row form-row-3">
-      <div class="form-group"><label>Valor unit. (R$)</label><input type="number" id="en-price" value="${e?e.price:''}"></div>
-      <div class="form-group"><label>Quantidade</label><input type="number" id="en-qty" value="${e?e.qty:1}"></div>
-      <div class="form-group"><label>Status</label><select id="en-status"><option value="pendente" ${e&&e.status==='pendente'?'selected':''}>Pendente</option><option value="recebido" ${e&&e.status==='recebido'?'selected':''}>Recebido</option></select></div>
-    </div>
-    <div class="form-row form-row-2">
-      <div class="form-group"><label>Data Referência</label><input type="date" id="en-date" value="${e&&e.date?e.date:new Date().toISOString().split('T')[0]}"></div>
-      <div class="form-group"><label>Descrição Curta</label><input type="text" id="en-desc" value="${e&&e.desc?e.desc:''}"></div>
-    </div>
-    <div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveEntry(${id ? id : 'null'})">Salvar</button></div>
-  `);
-  if(!e) fillPrice();
-}
-function fillPrice() { const el=document.getElementById('en-price'); if(el && document.getElementById('en-service')) el.value = gs(parseInt(document.getElementById('en-service').value)).price; }
-function saveEntry(id) {
-  const payload = { clientId: parseInt(document.getElementById('en-client').value), serviceId: parseInt(document.getElementById('en-service').value), price: parseFloat(document.getElementById('en-price').value)||0, qty: parseInt(document.getElementById('en-qty').value)||1, status: document.getElementById('en-status').value, date: document.getElementById('en-date').value, desc: document.getElementById('en-desc').value.trim() };
-  if(id !== 'null') Object.assign(S.entries.find(x=>x.id===parseInt(id)), payload); else S.entries.push({ id: uid(), ...payload });
-  saveData(); closeModal(); renderApp();
-}
-function toggleEntryStatus(id) { const e = S.entries.find(x=>x.id===id); if(e) { e.status = e.status === 'recebido' ? 'pendente' : 'recebido'; saveData(); renderApp(); } }
-function deleteEntry(id) { if(confirm('Remover lançamento?')) { S.entries = S.entries.filter(e=>e.id!==id); saveData(); renderApp(); } }
-
-function openDemandModal(id = null) {
-  const d = id ? gd(id) : null;
-  const clientOpts = S.clients.map(c=>`<option value="${c.id}" ${d&&d.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
-  const colOpts = COLS.map(col=>`<option value="${col.key}" ${d&&d.status===col.key?'selected':''}>${col.label}</option>`).join('');
-  showModal(`
-    <div class="modal-header"><div class="modal-title">${d ? 'Editar Demanda' : 'Nova Demanda'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div>
-    <div class="form-group"><label>Título</label><input id="dm-title" value="${d?d.title:''}"></div>
-    <div class="form-row form-row-2">
-      <div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="dm-client" style="flex:1">${clientOpts}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div>
-      <div class="form-group"><label>Status</label><select id="dm-status">${colOpts}</select></div>
-    </div>
-    <div class="form-group"><label>Prazo</label><input type="date" id="dm-due" value="${d&&d.due?d.due:''}"></div>
-    <div class="modal-footer" style="justify-content: space-between;">
-      <div style="display:flex; gap:8px; width:100%; justify-content: flex-start;">
-        ${d ? `<button class="btn btn-danger" onclick="confirmAction('Excluir esta demanda?', () => { deleteDemand(${d.id}); closeModal(); })">Excluir</button>` : ''}
-        ${d && d.due ? `<button class="btn btn-ghost" style="color:var(--blue); border-color: var(--blue-dim);" onclick="exportToGoogleCalendar(${d.id})">📅 Google Agenda</button>` : ''}
-      </div>
-      <div style="display:flex; gap:8px; width:100%; justify-content: flex-end;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveDemand(${d?d.id:'null'})">Salvar</button></div>
-    </div>
-  `);
-  setTimeout(()=>document.getElementById('dm-title').focus(), 100);
-}
-function saveDemand(id) {
-  const title = document.getElementById('dm-title').value.trim(); if(!title) return;
-  const payload = { title, clientId: parseInt(document.getElementById('dm-client').value), status: document.getElementById('dm-status').value, due: document.getElementById('dm-due').value };
-  if(id !== 'null') Object.assign(gd(parseInt(id)), payload); else S.demands.push({ id: uid(), ...payload });
-  saveData(); closeModal(); renderApp();
-}
-function deleteDemand(id) { S.demands = S.demands.filter(d=>d.id!==id); saveData(); renderApp(); }
-
-function renderServicos() {
-  document.getElementById('services-list').innerHTML=`<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Preço Padrão</th><th>Ações</th></tr></thead><tbody>${S.services.map(s => `<tr>
-      <td>${s.name}</td><td class="val-money" style="font-family:'DM Mono',monospace">${fmt(s.price)}</td>
-      <td style="display:flex; gap:6px;"><button class="btn btn-sm btn-ghost" onclick="openServiceModal(${s.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="confirmAction('Remover?', () => deleteService(${s.id}))">Excluir</button></td>
-    </tr>`).join('')}</tbody></table></div>`;
-}
-function openServiceModal(id = null) {
-  const s = id ? gs(id) : null;
-  showModal(`
-    <div class="modal-header"><div class="modal-title">${s ? 'Editar Serviço' : 'Novo Serviço'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div>
-    <div class="form-row form-row-2"><div class="form-group"><label>Nome</label><input id="sv-name" value="${s ? s.name : ''}"></div><div class="form-group"><label>Preço Padrão (R$)</label><input type="number" id="sv-price" value="${s ? s.price : ''}"></div></div>
-    <div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveService(${s ? s.id : 'null'})">Salvar</button></div>
-  `);
-}
-function saveService(id) {
-  const name = document.getElementById('sv-name').value.trim(); if(!name) return;
-  if(id !== 'null') Object.assign(gs(parseInt(id)), { name, price: parseFloat(document.getElementById('sv-price').value) || 0 });
-  else S.services.push({id:uid(), name, price: parseFloat(document.getElementById('sv-price').value) || 0 });
-  saveData(); closeModal(); renderApp();
-}
-function deleteService(id) { S.services = S.services.filter(s=>s.id!==id); saveData(); renderApp(); }
-
-function showModal(html) { document.getElementById('modal-container').innerHTML = `<div class="modal-overlay" onmousedown="if(event.target===this) closeModal()"><div class="modal">${html}</div></div>`; }
-function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
-let pendingConfirmAction = null;
-function confirmAction(msg, actionFn) {
-  pendingConfirmAction = actionFn;
-  showModal(`<div class="modal-header"><div class="modal-title">Atenção</div></div><p style="font-size:14px; margin-bottom:20px">${msg}</p><div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-danger" onclick="closeModal(); if(pendingConfirmAction) pendingConfirmAction(); pendingConfirmAction=null;">Confirmar Exclusão</button></div>`);
-}
-
-document.addEventListener('keydown', e => {
-  const hasModal = document.getElementById('modal-container').innerHTML !== '' || document.getElementById('quick-modal-container').innerHTML !== '';
-  if (hasModal && e.key === 'Escape') { if(document.getElementById('quick-modal-container').innerHTML !== '') document.getElementById('quick-modal-container').innerHTML = ''; else closeModal(); }
-  if (hasModal && e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); const c = document.getElementById('quick-modal-container').innerHTML !== '' ? document.getElementById('quick-modal-container') : document.getElementById('modal-container'); const b = c.querySelector('.btn-accent, .btn-danger'); if(b) b.click(); }
+document.addEventListener('keydown',e=>{
+  const hm=document.getElementById('modal-container').innerHTML!==''||document.getElementById('quick-modal-container').innerHTML!=='';
+  if(hm&&e.key==='Escape'){if(document.getElementById('quick-modal-container').innerHTML!=='')document.getElementById('quick-modal-container').innerHTML='';else closeModal();}
+  if(hm&&e.key==='Enter'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();const c=document.getElementById('quick-modal-container').innerHTML!==''?document.getElementById('quick-modal-container'):document.getElementById('modal-container');const b=c.querySelector('.btn-accent, .btn-danger');if(b)b.click();}
 });
 
-const SESSION_KEY = 'umidesk_auth';
-const PASSWORD_HASH = '323ef810dd19f40b77e63de99e457a172a477d36f3affd41305dd81deadc33a0';
-async function sha256(m) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(m)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+const SESSION_KEY='umidesk_auth';const PASSWORD_HASH='323ef810dd19f40b77e63de99e457a172a477d36f3affd41305dd81deadc33a0';
+async function sha256(m){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(m));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 
-function showLoginScreen() {
-  const login = document.createElement('div');
-  login.id = 'login-screen';
-  login.innerHTML = `
-    <style>
-      #login-screen { position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:99999; }
-      .login-box { background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:40px 36px;width:360px;text-align:center; }
-      .login-box input { background:var(--bg3);border:1px solid var(--border);color:var(--text); border-radius:8px;padding:11px 14px;font-size:14px;width:100%;margin-bottom:12px;text-align:center;letter-spacing:2px; }
-      .login-btn { width:100%;padding:11px;background:var(--accent);color:var(--accent-text);border:none;border-radius:8px;font-weight:600;cursor:pointer; }
-    </style>
-    <div class="login-box">
-      <div style="font-size:24px; font-weight:600; margin-bottom:20px">Umi<span style="color:var(--accent)">Desk</span></div>
-      <input type="password" id="login-input" placeholder="••••••••••" onkeydown="if(event.key==='Enter')tryLogin()">
-      <button class="login-btn" onclick="tryLogin()">Acessar Sistema</button>
-      <div id="login-err" style="color:var(--red); font-size:12px; margin-top:10px; min-height:15px"></div>
-    </div>
-  `;
-  document.body.appendChild(login);
-  setTimeout(()=>document.getElementById('login-input')?.focus(), 100);
+function showLoginScreen(){
+  const lg=document.createElement('div');lg.id='login-screen';
+  lg.innerHTML=`<style>#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:99999;}.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:40px 36px;width:360px;text-align:center;}.login-box input{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:11px 14px;font-size:14px;width:100%;margin-bottom:12px;text-align:center;letter-spacing:2px;}.login-btn{width:100%;padding:11px;background:var(--accent);color:var(--accent-text);border:none;border-radius:8px;font-weight:600;cursor:pointer;}</style><div class="login-box"><div style="font-size:24px;font-weight:600;margin-bottom:20px">Umi<span style="color:var(--accent)">Desk</span></div><input type="password" id="login-input" placeholder="••••••••••" onkeydown="if(event.key==='Enter')tryLogin()"><button class="login-btn" onclick="tryLogin()">Acessar Sistema</button><div id="login-err" style="color:var(--red);font-size:12px;margin-top:10px;min-height:15px"></div></div>`;
+  document.body.appendChild(lg);setTimeout(()=>document.getElementById('login-input')?.focus(),100);
 }
 
-async function tryLogin() {
-  const val = document.getElementById('login-input').value;
-  if(await sha256(val) === PASSWORD_HASH) {
-    sessionStorage.setItem(SESSION_KEY, '1'); document.getElementById('login-screen').remove();
-    document.getElementById('app-shell').style.display = 'flex'; loadData(); 
-  } else { document.getElementById('login-err').textContent = 'Senha incorreta.'; document.getElementById('login-input').value = ''; }
+async function tryLogin(){
+  const v=document.getElementById('login-input').value;
+  if(await sha256(v)===PASSWORD_HASH){sessionStorage.setItem(SESSION_KEY,'1');document.getElementById('login-screen').remove();document.getElementById('app-shell').style.display='flex';loadData();}
+  else{document.getElementById('login-err').textContent='Senha incorreta.';document.getElementById('login-input').value='';}
 }
 
-if(sessionStorage.getItem(SESSION_KEY) === '1') { document.getElementById('app-shell').style.display = 'flex'; loadData(); } else { showLoginScreen(); }
+if(sessionStorage.getItem(SESSION_KEY)==='1'){document.getElementById('app-shell').style.display='flex';loadData();}else{showLoginScreen();}
 </script>
 </body>
 </html>
