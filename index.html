@@ -11,7 +11,6 @@
   --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
   --text: #f0f0f0; --text2: #888; --text3: #555;
   
-  /* NOVO TEMA LARANJA */
   --accent: #ff8a00; 
   --accent-dim: rgba(255, 138, 0, 0.12); 
   --accent-text: #ffffff; 
@@ -144,7 +143,6 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
 .chart-bar:hover { filter: brightness(1.2); }
 .chart-val { position: absolute; top: -20px; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text); white-space: nowrap; }
 .chart-label { margin-top: 8px; font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; text-transform: uppercase; }
-
 </style>
 </head>
 <body>
@@ -287,7 +285,6 @@ const BIN_ID = '69c5c9cfaa77b81da923335f';
 const API_KEY = '$2a$10$JoXBCMxsjxa4gCJ1SioEBOQ4JlNDa3VbQpbjWqzQch2Af.2bDQ9ae';
 
 let S = {
-  user: { name: 'Gestor' },
   clients: [], services: [], entries: [], demands: [], clientPrices: [], nextId: 1
 };
 
@@ -307,7 +304,6 @@ async function loadData() {
     if(res.ok) {
       const data = await res.json();
       if(data.record) { 
-        S.user = data.record.user || { name: 'Gestor' };
         S.clients = data.record.clients || [];
         S.services = data.record.services || [];
         S.entries = data.record.entries || [];
@@ -339,6 +335,13 @@ const gc = id => S.clients.find(c=>c.id===id)||{name:'—',color:'#555', monthly
 const gs = id => S.services.find(s=>s.id===id)||{name:'—',price:0};
 const gd = id => S.demands.find(d=>d.id===id);
 const fmt = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return 'Bom dia';
+  if (hour >= 12 && hour < 18) return 'Boa tarde';
+  return 'Boa noite';
+}
 
 let isValuesHidden = false;
 function toggleHideValues() {
@@ -389,7 +392,7 @@ function renderApp() {
 
 // ─── 1. HOME (PRODUTIVIDADE) ───────────────────────────────────────────────
 function renderHomeProdutividade() {
-  document.getElementById('home-greeting').innerHTML = `Olá, ${S.user.name} 👋`;
+  document.getElementById('home-greeting').innerHTML = `${getGreeting()} 👋`;
 
   const now = new Date(); now.setHours(0,0,0,0);
   let openDemands = S.demands.filter(d => d.status !== 'concluido').map(d => {
@@ -467,11 +470,9 @@ function renderFinanceiroDash() {
   let aReceberContratos = 0;
   let aReceberAvulso = 0;
 
-  // A Receber: Lançamentos pendentes NO MÊS
   const pendentesAvulsos = S.entries.filter(e => e.status === 'pendente' && e.date.startsWith(currMonth));
   aReceberAvulso = pendentesAvulsos.reduce((s, e) => s + (e.price * e.qty), 0);
 
-  // A Receber: Mensalidades
   S.clients.forEach(c => {
     const data = calcClientMonthData(c.id, currMonth);
     MRR += (c.monthlyFee || 0);
@@ -499,7 +500,6 @@ function renderFinanceiroDash() {
 
   // Lista de devedores (Mensalidade + Avulso)
   let aReceberHtml = '';
-  // Combina dívida de mensalidade + dívida avulsa por cliente
   const mapDevedores = {};
   
   S.clients.forEach(c => {
@@ -537,25 +537,21 @@ function renderChart() {
   const meses = [];
   const valores = [];
   
-  // Pegar os últimos 6 meses (incluindo o atual)
   for (let i = 5; i >= 0; i--) {
       let d = new Date();
       d.setMonth(d.getMonth() - i);
       const mk = getMonthKey(d);
       const nomeMes = d.toLocaleString('pt-BR', { month: 'short' }).replace('.','').toUpperCase();
-      
-      const rec = S.entries.filter(e => e.status === 'recebido' && e.date.startsWith(mk))
-                           .reduce((s, e) => s + (e.price * e.qty), 0);
-      
+      const rec = S.entries.filter(e => e.status === 'recebido' && e.date.startsWith(mk)).reduce((s, e) => s + (e.price * e.qty), 0);
       meses.push(nomeMes);
       valores.push(rec);
   }
 
-  const maxVal = Math.max(...valores, 100); // Evitar div por zero
+  const maxVal = Math.max(...valores, 100); 
 
   let html = `<div class="chart-container">`;
   for(let i=0; i < 6; i++) {
-      const heightPercent = Math.max(5, (valores[i] / maxVal) * 100); // Min 5% para aparecer algo
+      const heightPercent = Math.max(5, (valores[i] / maxVal) * 100); 
       html += `
         <div class="chart-col">
             <div class="chart-val val-money">${valores[i] > 0 ? 'R$ '+valores[i] : ''}</div>
@@ -721,13 +717,17 @@ function payMonthlyFee(clientId) {
         svc = { id: uid(), name: 'Mensalidade', price: 0 };
         S.services.push(svc);
       }
-      S.entries.push({
-        id: uid(), clientId, serviceId: svc.id, qty: 1,
-        price: data.remaining, status: 'recebido',
+      
+      // ABRE O MODAL PREENCHIDO COM O VALOR RESTANTE. (Pode ser editado para pagamentos parciais).
+      openEntryModal(null, {
+        clientId: clientId,
+        serviceId: svc.id,
+        qty: 1,
+        price: data.remaining,
+        status: 'recebido',
         date: new Date().toISOString().split('T')[0],
         desc: 'Ref. Mensalidade ' + currMonth.split('-').reverse().join('/')
       });
-      saveData(); renderApp();
   }
 }
 
@@ -801,14 +801,14 @@ function renderFinanceiro() {
   el.innerHTML = html;
 }
 
-function openEntryModal(id = null) {
-  const e = id ? S.entries.find(x=>x.id===id) : null;
+function openEntryModal(id = null, prefill = null) {
+  const e = id ? S.entries.find(x=>x.id===id) : prefill;
   const clientOpts = S.clients.map(c=>`<option value="${c.id}" ${e&&e.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
   const serviceOpts = S.services.map(s=>`<option value="${s.id}" ${e&&e.serviceId===s.id?'selected':''}>${s.name}</option>`).join('');
 
   showModal(`
     <div class="modal-header">
-      <div class="modal-title">${e ? 'Editar Lançamento' : 'Novo Lançamento Extra'}</div>
+      <div class="modal-title">${id ? 'Editar Lançamento' : 'Novo Lançamento Extra'}</div>
       <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
     </div>
     <div class="form-row form-row-2">
@@ -835,11 +835,11 @@ function openEntryModal(id = null) {
     
     <div class="form-row form-row-2">
       <div class="form-group"><label>Data Referência</label><input type="date" id="en-date" value="${e?e.date:new Date().toISOString().split('T')[0]}"></div>
-      <div class="form-group"><label>Descrição Curta</label><input type="text" id="en-desc" value="${e?e.desc:''}"></div>
+      <div class="form-group"><label>Descrição Curta</label><input type="text" id="en-desc" value="${e&&e.desc?e.desc:''}"></div>
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-accent" onclick="saveEntry(${e?e.id:'null'})">${e ? 'Salvar Lançamento' : 'Registrar'}</button>
+      <button class="btn btn-accent" onclick="saveEntry(${id ? id : 'null'})">${id ? 'Salvar Lançamento' : 'Registrar'}</button>
     </div>
   `);
   if(!e) fillPrice();
@@ -933,28 +933,40 @@ function renderServicos() {
     <thead><tr><th>Nome do Serviço</th><th>Preço Padrão</th><th>Ações</th></tr></thead>
     <tbody>${S.services.map(s => `<tr>
       <td>${s.name}</td><td class="val-money" style="font-family:'DM Mono',monospace">${fmt(s.price)}</td>
-      <td><button class="btn btn-sm btn-danger" onclick="confirmAction('Remover serviço?', () => deleteService(${s.id}))">Excluir</button></td>
+      <td style="display:flex; gap:6px;">
+        <button class="btn btn-sm btn-ghost" onclick="openServiceModal(${s.id})">Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmAction('Remover serviço?', () => deleteService(${s.id}))">Excluir</button>
+      </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
 
-function openServiceModal() {
+function openServiceModal(id = null) {
+  const s = id ? S.services.find(x=>x.id===id) : null;
   showModal(`
-    <div class="modal-header"><div class="modal-title">Novo Serviço</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${s ? 'Editar Serviço' : 'Novo Serviço'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div>
     <div class="form-row form-row-2">
-      <div class="form-group"><label>Nome</label><input id="sv-name"></div>
-      <div class="form-group"><label>Preço Padrão (R$)</label><input type="number" id="sv-price"></div>
+      <div class="form-group"><label>Nome</label><input id="sv-name" value="${s ? s.name : ''}"></div>
+      <div class="form-group"><label>Preço Padrão (R$)</label><input type="number" id="sv-price" value="${s ? s.price : ''}"></div>
     </div>
-    <div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveService()">Criar</button></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveService(${s ? s.id : 'null'})">Salvar</button></div>
   `);
 }
 
-function saveService() {
+function saveService(id) {
+  id = id !== 'null' ? parseInt(id) : null;
   const name = document.getElementById('sv-name').value.trim();
   const price = parseFloat(document.getElementById('sv-price').value) || 0;
   if(!name) return;
-  S.services.push({id:uid(), name, price});
+  
+  if(id) {
+    const s = S.services.find(x=>x.id===id);
+    if(s) { s.name = name; s.price = price; }
+  } else {
+    S.services.push({id:uid(), name, price});
+  }
   saveData(); closeModal(); renderApp();
 }
+
 function deleteService(id) { S.services = S.services.filter(s=>s.id!==id); saveData(); renderApp(); }
 
 // ─── MODAL GLOBAL & ATALHOS ────────────────────────────────────────────────
