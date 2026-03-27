@@ -109,13 +109,9 @@ td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle
 .chart-val{position:absolute;top:-20px;font-size:11px;font-family:'DM Mono',monospace;color:var(--text);white-space:nowrap}
 .chart-label{margin-top:8px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase}
 
-/* TRUQUE DO DARK MODE NO IFRAME DO GOOGLE CALENDAR */
 .iframe-container{position:relative;width:100%;height:calc(100vh - 180px);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--bg2)}
 .iframe-container iframe{
-  width:100%;
-  height:100%;
-  border:none;
-  /* Isso inverte a cor branca para preto, e o hue-rotate mantém as cores das etiquetas de evento corretas! */
+  width:100%; height:100%; border:none;
   filter: invert(0.92) hue-rotate(180deg) contrast(1.05);
 }
 
@@ -401,24 +397,27 @@ function renderClientes(){
     h+=`<tr><td><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></td><td class="val-money" style="font-family:'DM Mono',monospace">${fmt(c.monthlyFee||0)}</td><td class="val-money val-green" style="font-family:'DM Mono',monospace">${fmt(d.paidThisMonth)}</td><td class="val-money" style="font-family:'DM Mono',monospace;color:${d.remaining>0?'var(--red)':'var(--text3)'}">${fmt(d.remaining)}</td><td><span class="badge ${bc}">${d.status}</span></td><td style="display:flex;gap:6px;flex-wrap:wrap;">${d.remaining>0?`<button class="btn btn-sm btn-accent" style="color:var(--bg)" onclick="payMonthlyFee(${c.id})">Baixar Mês</button>`:''}<button class="btn btn-sm btn-ghost" onclick="openClientModal(${c.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="confirmAction('Remover cliente?',()=>deleteClient(${c.id}))">Excluir</button></td></tr>`;
   });el.innerHTML=h+`</tbody></table></div>`;
 }
+
 function openClientModal(id=null){
   const c=id?gc(id):null;
-  showModal(`<div class="modal-header"><div class="modal-title">${c?'Editar Cliente':'Novo Cliente'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-row form-row-2"><div class="form-group"><label>Nome</label><input id="cl-name" value="${c?c.name:''}"></div><div class="form-group"><label>Cor</label><input type="color" id="cl-color" value="${c?c.color:'#ff8a00'}" style="height:38px;padding:2px"></div></div><div class="form-group"><label>Valor Mensal (R$)</label><input type="number" id="cl-fee" value="${c?(c.monthlyFee||0):0}" step="0.01"></div><div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveClient(${c?c.id:'null'})">Salvar</button></div>`);
+  showModal(`<div class="modal-header"><div class="modal-title">${c?'Editar Cliente':'Novo Cliente'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-row form-row-2"><div class="form-group"><label>Nome</label><input id="cl-name" value="${c?c.name:''}"></div><div class="form-group"><label>Cor</label><input type="color" id="cl-color" value="${c?c.color:'#ff8a00'}" style="height:38px;padding:2px"></div></div><div class="form-group"><label>Valor Mensal (R$)</label><input type="number" id="cl-fee" value="${c?(c.monthlyFee||0):0}" step="0.01"></div><div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveClient(${c?c.id:null})">Salvar</button></div>`);
   setTimeout(()=>document.getElementById('cl-name').focus(),100);
 }
 function saveClient(id){
   const n=document.getElementById('cl-name').value.trim();if(!n)return;
-  if(id!=='null')Object.assign(gc(parseInt(id)),{name:n,color:document.getElementById('cl-color').value,monthlyFee:parseFloat(document.getElementById('cl-fee').value)||0});
+  if(id)Object.assign(gc(parseInt(id)),{name:n,color:document.getElementById('cl-color').value,monthlyFee:parseFloat(document.getElementById('cl-fee').value)||0});
   else S.clients.push({id:uid(),name:n,color:document.getElementById('cl-color').value,monthlyFee:parseFloat(document.getElementById('cl-fee').value)||0});
   saveData();closeModal();renderApp();
 }
 function deleteClient(id){S.clients=S.clients.filter(c=>c.id!==id);S.entries=S.entries.filter(e=>e.clientId!==id);S.demands=S.demands.filter(d=>d.clientId!==id);saveData();renderApp();}
+
 function payMonthlyFee(cid){
   const d=calcClientMonthData(cid);if(d.remaining>0){
     let s=S.services.find(x=>x.name==='Mensalidade');if(!s){s={id:uid(),name:'Mensalidade',price:0};S.services.push(s);}
     openEntryModal(null,{clientId:cid,serviceId:s.id,qty:1,price:d.remaining,status:'recebido',date:new Date().toISOString().split('T')[0],desc:'Ref. Mensalidade'});
   }
 }
+
 function openQuickClientModal(){
   document.getElementById('quick-modal-container').innerHTML=`<div class="modal-overlay-quick"><div class="modal modal-sm"><div class="modal-header"><div class="modal-title">Novo Cliente Rápido</div></div><div class="form-group"><label>Nome</label><input id="quick-cl-name"></div><div class="modal-footer"><button class="btn" onclick="document.getElementById('quick-modal-container').innerHTML=''">Cancelar</button><button class="btn btn-accent" onclick="saveQuickClient()">Criar</button></div></div></div>`;
   setTimeout(()=>document.getElementById('quick-cl-name').focus(),100);
@@ -439,17 +438,19 @@ function renderFinanceiro(){
     h+=`<tr><td style="font-family:'DM Mono',monospace">${e.date&&e.date.includes('-')?e.date.split('-').reverse().join('/'):e.date}</td><td><span class="chip"><span class="chip-dot" style="background:${gc(e.clientId).color}"></span>${gc(e.clientId).name}</span></td><td>${gs(e.serviceId).name} ${e.qty>1?`<span style="color:var(--text3);font-size:11px">x${e.qty}</span>`:''} ${e.desc?`<span style="color:var(--text3)">— ${e.desc}</span>`:''}</td><td class="val-money" style="font-family:'DM Mono',monospace;font-weight:500">${fmt((e.price||0)*(e.qty||1))}</td><td><span class="badge ${e.status==='recebido'?'badge-green':'badge-yellow'}" style="cursor:pointer" onclick="toggleEntryStatus(${e.id})">${(e.status||'').toUpperCase()}</span></td><td style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-sm btn-ghost" onclick="openEntryModal(${e.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="deleteEntry(${e.id})">✕</button></td></tr>`;
   });el.innerHTML=h+`</tbody></table></div>`;
 }
+
 function openEntryModal(id=null,pf=null){
   const e=id?S.entries.find(x=>x.id===id):pf;
   const co=S.clients.map(c=>`<option value="${c.id}" ${e&&e.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
   const so=S.services.map(s=>`<option value="${s.id}" ${e&&e.serviceId===s.id?'selected':''}>${s.name}</option>`).join('');
-  showModal(`<div class="modal-header"><div class="modal-title">${id?'Editar Lançamento':'Novo Lançamento'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-row form-row-2"><div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="en-client" style="flex:1" onchange="fillPrice()">${co}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div><div class="form-group"><label>Serviço</label><select id="en-service" onchange="fillPrice()">${so}</select></div></div><div class="form-row form-row-3"><div class="form-group"><label>Valor unit. (R$)</label><input type="number" id="en-price" value="${e?e.price:''}"></div><div class="form-group"><label>Quantidade</label><input type="number" id="en-qty" value="${e?e.qty:1}"></div><div class="form-group"><label>Status</label><select id="en-status"><option value="pendente" ${e&&e.status==='pendente'?'selected':''}>Pendente</option><option value="recebido" ${e&&e.status==='recebido'?'selected':''}>Recebido</option></select></div></div><div class="form-row form-row-2"><div class="form-group"><label>Data Referência</label><input type="date" id="en-date" value="${e&&e.date?e.date:new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label>Descrição Curta</label><input type="text" id="en-desc" value="${e&&e.desc?e.desc:''}"></div></div><div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveEntry(${id?id:'null'})">Salvar</button></div>`);
+  showModal(`<div class="modal-header"><div class="modal-title">${id?'Editar Lançamento':'Novo Lançamento'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-row form-row-2"><div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="en-client" style="flex:1" onchange="fillPrice()">${co}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div><div class="form-group"><label>Serviço</label><select id="en-service" onchange="fillPrice()">${so}</select></div></div><div class="form-row form-row-3"><div class="form-group"><label>Valor unit. (R$)</label><input type="number" id="en-price" value="${e?e.price:''}"></div><div class="form-group"><label>Quantidade</label><input type="number" id="en-qty" value="${e?e.qty:1}"></div><div class="form-group"><label>Status</label><select id="en-status"><option value="pendente" ${e&&e.status==='pendente'?'selected':''}>Pendente</option><option value="recebido" ${e&&e.status==='recebido'?'selected':''}>Recebido</option></select></div></div><div class="form-row form-row-2"><div class="form-group"><label>Data Referência</label><input type="date" id="en-date" value="${e&&e.date?e.date:new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label>Descrição Curta</label><input type="text" id="en-desc" value="${e&&e.desc?e.desc:''}"></div></div><div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveEntry(${id?id:null})">Salvar</button></div>`);
   if(!e)fillPrice();
 }
+
 function fillPrice(){const el=document.getElementById('en-price');if(el&&document.getElementById('en-service'))el.value=gs(parseInt(document.getElementById('en-service').value)).price;}
 function saveEntry(id){
   const p={clientId:parseInt(document.getElementById('en-client').value),serviceId:parseInt(document.getElementById('en-service').value),price:parseFloat(document.getElementById('en-price').value)||0,qty:parseInt(document.getElementById('en-qty').value)||1,status:document.getElementById('en-status').value,date:document.getElementById('en-date').value,desc:document.getElementById('en-desc').value.trim()};
-  if(id!=='null')Object.assign(S.entries.find(x=>x.id===parseInt(id)),p);else S.entries.push({id:uid(),...p});
+  if(id)Object.assign(S.entries.find(x=>x.id===parseInt(id)),p);else S.entries.push({id:uid(),...p});
   saveData();closeModal();renderApp();
 }
 function toggleEntryStatus(id){const e=S.entries.find(x=>x.id===id);if(e){e.status=e.status==='recebido'?'pendente':'recebido';saveData();renderApp();}}
@@ -459,13 +460,14 @@ function openDemandModal(id=null){
   const d=id?gd(id):null;
   const co=S.clients.map(c=>`<option value="${c.id}" ${d&&d.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
   const so=COLS.map(c=>`<option value="${c.key}" ${d&&d.status===c.key?'selected':''}>${c.label}</option>`).join('');
-  showModal(`<div class="modal-header"><div class="modal-title">${d?'Editar Demanda':'Nova Demanda'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-group"><label>Título</label><input id="dm-title" value="${d?d.title:''}"></div><div class="form-row form-row-2"><div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="dm-client" style="flex:1">${co}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div><div class="form-group"><label>Status</label><select id="dm-status">${so}</select></div></div><div class="form-group"><label>Prazo</label><input type="date" id="dm-due" value="${d&&d.due?d.due:''}"></div><div class="modal-footer" style="justify-content:space-between;"><div style="display:flex;gap:8px;width:100%;justify-content:flex-start;">${d?`<button class="btn btn-danger" onclick="confirmAction('Excluir?',()=>deleteDemand(${d.id}))">Excluir</button>`:''}${d&&d.due?`<button class="btn btn-ghost" style="color:var(--blue)" onclick="exportToGoogleCalendar(${d.id})">📅 Agenda</button>`:''}</div><div style="display:flex;gap:8px;width:100%;justify-content:flex-end;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveDemand(${d?d.id:'null'})">Salvar</button></div></div>`);
+  showModal(`<div class="modal-header"><div class="modal-title">${d?'Editar Demanda':'Nova Demanda'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-group"><label>Título</label><input id="dm-title" value="${d?d.title:''}"></div><div class="form-row form-row-2"><div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="dm-client" style="flex:1">${co}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div><div class="form-group"><label>Status</label><select id="dm-status">${so}</select></div></div><div class="form-group"><label>Prazo</label><input type="date" id="dm-due" value="${d&&d.due?d.due:''}"></div><div class="modal-footer" style="justify-content:space-between;"><div style="display:flex;gap:8px;width:100%;justify-content:flex-start;">${d?`<button class="btn btn-danger" onclick="confirmAction('Excluir?',()=>deleteDemand(${d.id}))">Excluir</button>`:''}${d&&d.due?`<button class="btn btn-ghost" style="color:var(--blue)" onclick="exportToGoogleCalendar(${d.id})">📅 Agenda</button>`:''}</div><div style="display:flex;gap:8px;width:100%;justify-content:flex-end;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveDemand(${d?d.id:null})">Salvar</button></div></div>`);
   setTimeout(()=>document.getElementById('dm-title').focus(),100);
 }
+
 function saveDemand(id){
   const t=document.getElementById('dm-title').value.trim();if(!t)return;
   const p={title:t,clientId:parseInt(document.getElementById('dm-client').value),status:document.getElementById('dm-status').value,due:document.getElementById('dm-due').value};
-  if(id!=='null')Object.assign(gd(parseInt(id)),p);else S.demands.push({id:uid(),...p});
+  if(id)Object.assign(gd(parseInt(id)),p);else S.demands.push({id:uid(),...p});
   saveData();closeModal();renderApp();
 }
 function deleteDemand(id){S.demands=S.demands.filter(d=>d.id!==id);saveData();closeModal();renderApp();}
@@ -473,13 +475,15 @@ function deleteDemand(id){S.demands=S.demands.filter(d=>d.id!==id);saveData();cl
 function renderServicos(){
   document.getElementById('services-list').innerHTML=`<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Preço Padrão</th><th>Ações</th></tr></thead><tbody>${S.services.map(s=>`<tr><td>${s.name}</td><td class="val-money" style="font-family:'DM Mono',monospace">${fmt(s.price)}</td><td style="display:flex;gap:6px;"><button class="btn btn-sm btn-ghost" onclick="openServiceModal(${s.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="confirmAction('Remover?',()=>deleteService(${s.id}))">Excluir</button></td></tr>`).join('')}</tbody></table></div>`;
 }
+
 function openServiceModal(id=null){
   const s=id?gs(id):null;
-  showModal(`<div class="modal-header"><div class="modal-title">${s?'Editar Serviço':'Novo Serviço'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-row form-row-2"><div class="form-group"><label>Nome</label><input id="sv-name" value="${s?s.name:''}"></div><div class="form-group"><label>Preço Padrão (R$)</label><input type="number" id="sv-price" value="${s?s.price:''}"></div></div><div class="modal-footer"><div style="width:100%;display:flex;justify-content:flex-end;gap:8px;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveService(${s?s.id:'null'})">Salvar</button></div></div>`);
+  showModal(`<div class="modal-header"><div class="modal-title">${s?'Editar Serviço':'Novo Serviço'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-row form-row-2"><div class="form-group"><label>Nome</label><input id="sv-name" value="${s?s.name:''}"></div><div class="form-group"><label>Preço Padrão (R$)</label><input type="number" id="sv-price" value="${s?s.price:''}"></div></div><div class="modal-footer"><div style="width:100%;display:flex;justify-content:flex-end;gap:8px;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveService(${s?s.id:null})">Salvar</button></div></div>`);
 }
+
 function saveService(id){
   const n=document.getElementById('sv-name').value.trim();if(!n)return;
-  if(id!=='null')Object.assign(gs(parseInt(id)),{name:n,price:parseFloat(document.getElementById('sv-price').value)||0});
+  if(id)Object.assign(gs(parseInt(id)),{name:n,price:parseFloat(document.getElementById('sv-price').value)||0});
   else S.services.push({id:uid(),name:n,price:parseFloat(document.getElementById('sv-price').value)||0});
   saveData();closeModal();renderApp();
 }
