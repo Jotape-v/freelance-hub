@@ -10,7 +10,12 @@
   --bg: #0f0f0f; --bg2: #181818; --bg3: #222222; --bg4: #2a2a2a;
   --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
   --text: #f0f0f0; --text2: #888; --text3: #555;
-  --accent: #c8f55a; --accent-dim: rgba(200,245,90,0.12); --accent-text: #1a2a00;
+  
+  /* NOVO TEMA LARANJA */
+  --accent: #ff8a00; 
+  --accent-dim: rgba(255, 138, 0, 0.12); 
+  --accent-text: #ffffff; 
+  
   --red: #ff5c5c; --red-dim: rgba(255,92,92,0.1);
   --yellow: #ffd166; --yellow-dim: rgba(255,209,102,0.1);
   --blue: #5c9eff; --blue-dim: rgba(92,158,255,0.1);
@@ -29,9 +34,9 @@ html, body { background: var(--bg); color: var(--text); min-height: 100vh; font-
 
 /* Layout & Utils */
 .shell { display: flex; min-height: 100vh; }
-.sidebar { width: 220px; min-width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.sidebar { width: 220px; min-width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; z-index: 10; }
 .main { flex: 1; overflow: auto; position: relative; }
-.sync-badge { position: absolute; top: 12px; right: 36px; font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; }
+.sync-badge { position: absolute; top: 12px; right: 36px; font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; z-index: 10; }
 .sync-badge.syncing { color: var(--yellow); }
 .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 .syncing .sync-dot { background: var(--yellow); animation: pulse 1s infinite; }
@@ -69,7 +74,7 @@ html, body { background: var(--bg); color: var(--text); min-height: 100vh; font-
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); cursor: pointer; font-size: 13px; transition: all .15s; }
 .btn:hover { background: var(--bg4); border-color: var(--border2); }
 .btn-accent { background: var(--accent); color: var(--accent-text); border-color: transparent; font-weight: 600; }
-.btn-accent:hover { background: #d4f870; }
+.btn-accent:hover { opacity: 0.9; }
 .btn-ghost { background: transparent; border-color: transparent; color: var(--text2); }
 .btn-ghost:hover { background: var(--bg3); color: var(--text); }
 .btn-danger { background: transparent; border-color: transparent; color: var(--red); }
@@ -78,7 +83,7 @@ html, body { background: var(--bg); color: var(--text); min-height: 100vh; font-
 
 /* Forms & Tables */
 input, select, textarea { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; width: 100%; transition: border .15s; }
-input:focus, select:focus, textarea:focus { outline: none; border-color: var(--border2); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
 label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em; font-family: 'DM Mono', monospace; }
 .form-group { margin-bottom: 14px; }
 .form-row { display: grid; gap: 12px; } .form-row-2 { grid-template-columns: 1fr 1fr; } .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -125,11 +130,21 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
 .kanban-move-btn:hover { background: var(--bg3); border-color: var(--accent); color: var(--accent); }
 
 /* Sections */
-.section-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.section-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; height: 100%; }
 .section-box-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .quick-add-wrap { display: flex; gap: 8px; }
 .quick-add-btn { background: var(--bg4); border: 1px solid var(--border); color: var(--text); border-radius: 6px; width: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .quick-add-btn:hover { background: var(--bg3); color: var(--accent); }
+
+/* Custom Chart CSS */
+.chart-container { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; height: 160px; padding: 30px 20px 20px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 28px;}
+.chart-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; position: relative; }
+.chart-bar { width: 100%; background: var(--bg4); border-radius: 4px 4px 0 0; transition: height 0.5s ease, background 0.3s; position: relative; }
+.chart-col:last-child .chart-bar { background: var(--accent); }
+.chart-bar:hover { filter: brightness(1.2); }
+.chart-val { position: absolute; top: -20px; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text); white-space: nowrap; }
+.chart-label { margin-top: 8px; font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; text-transform: uppercase; }
+
 </style>
 </head>
 <body>
@@ -145,6 +160,10 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
       <button class="nav-item active" onclick="goPage('home',this)">
         <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
         Home
+      </button>
+      <button class="nav-item" onclick="goPage('financeiro_dash',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14h12M4 10v4M8 6v8M12 2v12"/></svg>
+        Dashboard Financeiro
       </button>
       <div class="nav-section">Operacional</div>
       <button class="nav-item" onclick="goPage('kanban',this)">
@@ -177,26 +196,51 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
       <div class="page-header">
         <div>
           <div class="page-title-home" id="home-greeting">Olá 👋</div>
-          <div class="page-sub">Resumo das suas operações e metas.</div>
+          <div class="page-sub">Resumo da sua produtividade e tarefas.</div>
+        </div>
+        <button class="btn btn-accent" onclick="openDemandModal()">Nova Demanda</button>
+      </div>
+      
+      <div class="stat-grid" id="home-prod-stats"></div>
+
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px">
+        <div class="section-box">
+          <div class="section-box-head">
+            <span class="section-box-title" style="font-weight:600">🎯 Foco do Dia (Atrasadas / Hoje)</span>
+            <button class="btn btn-ghost btn-sm" onclick="goPage('kanban',document.querySelectorAll('.nav-item')[3])">Ir para Kanban →</button>
+          </div>
+          <div id="home-urgent-demands"></div>
+        </div>
+        
+        <div class="section-box">
+          <div class="section-box-head">
+            <span class="section-box-title" style="font-weight:600">🔜 Próximas Entregas</span>
+          </div>
+          <div id="home-next-demands"></div>
         </div>
       </div>
-      <div class="stat-grid" id="home-stats"></div>
+    </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="section-box">
-          <div class="section-box-head">
-            <span class="section-box-title" style="font-weight:600">🎯 Foco do Dia & Próximas</span>
-            <button class="btn btn-ghost btn-sm" onclick="goPage('kanban',document.querySelectorAll('.nav-item')[1])">Ver Board →</button>
-          </div>
-          <div id="home-demands"></div>
+    <div class="page" id="page-financeiro_dash">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Visão Financeira</div>
+          <div class="page-sub">Seus resultados e métricas financeiras.</div>
         </div>
-        <div class="section-box">
-          <div class="section-box-head">
-            <span class="section-box-title" style="font-weight:600">💸 A Receber no Mês</span>
-            <button class="btn btn-ghost btn-sm" onclick="goPage('clientes',document.querySelectorAll('.nav-item')[3])">Ver Clientes →</button>
-          </div>
-          <div id="home-receivables"></div>
+        <button class="btn btn-accent" onclick="openEntryModal()">Novo Lançamento</button>
+      </div>
+      
+      <div class="stat-grid" id="home-stats"></div>
+      
+      <div style="margin-bottom: 12px; font-size: 13px; font-weight: 500; color: var(--text2);">Receita dos últimos 6 meses</div>
+      <div id="finance-chart"></div>
+
+      <div class="section-box">
+        <div class="section-box-head">
+          <span class="section-box-title" style="font-weight:600">⚠️ Inadimplentes / A Receber (Mês Atual)</span>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('clientes',document.querySelectorAll('.nav-item')[5])">Ver Clientes →</button>
         </div>
+        <div id="home-receivables"></div>
       </div>
     </div>
 
@@ -263,7 +307,6 @@ async function loadData() {
     if(res.ok) {
       const data = await res.json();
       if(data.record) { 
-        // A trava de segurança! Preenche os vazios se a base de dados for de uma versão antiga.
         S.user = data.record.user || { name: 'Gestor' };
         S.clients = data.record.clients || [];
         S.services = data.record.services || [];
@@ -336,93 +379,147 @@ function goPage(name, el) {
 }
 
 function renderApp() {
-  if(currentPage==='home') renderHome();
+  if(currentPage==='home') renderHomeProdutividade();
+  if(currentPage==='financeiro_dash') renderFinanceiroDash();
   if(currentPage==='kanban') renderKanban();
   if(currentPage==='financeiro') renderFinanceiro();
   if(currentPage==='clientes') renderClientes();
   if(currentPage==='servicos') renderServicos();
 }
 
-// ─── 1. & 10. HOME / DASHBOARD ─────────────────────────────────────────────
-function renderHome() {
+// ─── 1. HOME (PRODUTIVIDADE) ───────────────────────────────────────────────
+function renderHomeProdutividade() {
   document.getElementById('home-greeting').innerHTML = `Olá, ${S.user.name} 👋`;
 
+  const now = new Date(); now.setHours(0,0,0,0);
+  let openDemands = S.demands.filter(d => d.status !== 'concluido').map(d => {
+    let diffDays = null;
+    if(d.due) {
+      const dDate = new Date(d.due + 'T00:00:00');
+      diffDays = Math.round((dDate - now) / (1000 * 60 * 60 * 24));
+    }
+    return {...d, diffDays};
+  });
+
+  const atrasadas = openDemands.filter(d => d.diffDays !== null && d.diffDays < 0).length;
+  const venceHoje = openDemands.filter(d => d.diffDays === 0).length;
+  const emAndamento = S.demands.filter(d => d.status === 'em_andamento').length;
+  const revisao = S.demands.filter(d => d.status === 'revisao').length;
+
+  document.getElementById('home-prod-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Atrasadas</div><div class="stat-val ${atrasadas > 0 ? 'val-red' : ''}">${atrasadas}</div></div>
+    <div class="stat-card"><div class="stat-label">Vence Hoje</div><div class="stat-val ${venceHoje > 0 ? 'val-yellow' : ''}">${venceHoje}</div></div>
+    <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-val val-blue">${emAndamento}</div></div>
+    <div class="stat-card"><div class="stat-label">Aguardando Revisão</div><div class="stat-val" style="color:#ffd166">${revisao}</div></div>
+  `;
+
+  // Listar Urgentes (Atrasadas e Hoje)
+  const urgentes = openDemands.filter(d => d.diffDays !== null && d.diffDays <= 0).sort((a,b) => a.diffDays - b.diffDays);
+  let urgHtml = '';
+  if(urgentes.length > 0) {
+    urgHtml += `<table style="font-size:12px"><tbody>`;
+    urgentes.forEach(d => {
+      const c = gc(d.clientId);
+      const flag = d.diffDays < 0 ? `<span class="badge badge-red">Atrasado (${Math.abs(d.diffDays)}d)</span>` : `<span class="badge badge-yellow">Vence Hoje</span>`;
+      urgHtml += `<tr style="cursor:pointer" onclick="openDemandModal(${d.id})">
+        <td style="padding:10px; border-bottom:1px solid var(--border)">
+          <div style="font-weight:500; font-size:13px">${d.title}</div>
+          <div style="margin-top:6px"><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></div>
+        </td>
+        <td style="text-align:right; padding:10px; border-bottom:1px solid var(--border)">${flag}</td>
+      </tr>`;
+    });
+    urgHtml += `</tbody></table>`;
+  } else {
+    urgHtml = `<div class="empty-state" style="padding:20px">Mandou bem! Nenhuma entrega atrasada ou para hoje.</div>`;
+  }
+  document.getElementById('home-urgent-demands').innerHTML = urgHtml;
+
+  // Listar Próximas (Em breve)
+  const proximas = openDemands.filter(d => d.diffDays !== null && d.diffDays > 0).sort((a,b) => a.diffDays - b.diffDays).slice(0, 5);
+  let proxHtml = '';
+  if(proximas.length > 0) {
+    proxHtml += `<table style="font-size:12px"><tbody>`;
+    proximas.forEach(d => {
+      const c = gc(d.clientId);
+      proxHtml += `<tr style="cursor:pointer" onclick="openDemandModal(${d.id})">
+        <td style="padding:10px; border-bottom:1px solid var(--border)">
+          <div style="font-weight:500">${d.title}</div>
+          <div style="margin-top:4px"><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></div>
+        </td>
+        <td style="text-align:right; padding:10px; border-bottom:1px solid var(--border)"><span style="color:var(--text3); font-family:'DM Mono', monospace">em ${d.diffDays} dias</span></td>
+      </tr>`;
+    });
+    proxHtml += `</tbody></table>`;
+  } else {
+    proxHtml = `<div class="empty-state" style="padding:20px">Nenhuma entrega com prazo futuro definida.</div>`;
+  }
+  document.getElementById('home-next-demands').innerHTML = proxHtml;
+}
+
+// ─── 2. DASHBOARD FINANCEIRO (NOVA ABA) ────────────────────────────────────
+function renderFinanceiroDash() {
   const currMonth = getMonthKey();
   let lastMonthDate = new Date(); lastMonthDate.setMonth(lastMonthDate.getMonth()-1);
   const lastMonth = getMonthKey(lastMonthDate);
 
   let MRR = 0;
-  let totalReceberMes = 0;
+  let aReceberContratos = 0;
+  let aReceberAvulso = 0;
+
+  // A Receber: Lançamentos pendentes NO MÊS
+  const pendentesAvulsos = S.entries.filter(e => e.status === 'pendente' && e.date.startsWith(currMonth));
+  aReceberAvulso = pendentesAvulsos.reduce((s, e) => s + (e.price * e.qty), 0);
+
+  // A Receber: Mensalidades
   S.clients.forEach(c => {
     const data = calcClientMonthData(c.id, currMonth);
     MRR += (c.monthlyFee || 0);
-    totalReceberMes += data.remaining;
+    aReceberContratos += data.remaining;
   });
 
+  const totalReceberMes = aReceberContratos + aReceberAvulso;
   const previsao = MRR;
 
-  const receitaMesAtual = S.entries.filter(e => e.status === 'recebido' && e.date.startsWith(currMonth))
-                                   .reduce((sum, e) => sum + (e.price*e.qty), 0);
-  const receitaMesPassado = S.entries.filter(e => e.status === 'recebido' && e.date.startsWith(lastMonth))
-                                     .reduce((sum, e) => sum + (e.price*e.qty), 0);
+  const receitaMesAtual = S.entries.filter(e => e.status === 'recebido' && e.date.startsWith(currMonth)).reduce((sum, e) => sum + (e.price*e.qty), 0);
+  const receitaMesPassado = S.entries.filter(e => e.status === 'recebido' && e.date.startsWith(lastMonth)).reduce((sum, e) => sum + (e.price*e.qty), 0);
+  
   const variacao = receitaMesAtual - receitaMesPassado;
   const varColor = variacao >= 0 ? 'var(--green)' : 'var(--red)';
   const varText = variacao >= 0 ? `+ ${fmt(variacao)}` : `- ${fmt(Math.abs(variacao))}`;
 
-  const demandasAbertas = S.demands.filter(d => d.status !== 'concluido').length;
-
   document.getElementById('home-stats').innerHTML = `
     <div class="stat-card"><div class="stat-label">MRR (Contratos)</div><div class="stat-val val-money val-accent">${fmt(MRR)}</div></div>
-    <div class="stat-card"><div class="stat-label">Previsão do Mês</div><div class="stat-val val-money">${fmt(previsao)}</div></div>
-    <div class="stat-card"><div class="stat-label">A Receber no Mês</div><div class="stat-val val-money val-red">${fmt(totalReceberMes)}</div></div>
+    <div class="stat-card"><div class="stat-label">Previsão Fixa do Mês</div><div class="stat-val val-money">${fmt(previsao)}</div></div>
+    <div class="stat-card"><div class="stat-label">A Receber no Mês (Total)</div><div class="stat-val val-money val-red">${fmt(totalReceberMes)}</div></div>
     <div class="stat-card"><div class="stat-label">Receita do Mês</div><div class="stat-val val-money val-green">${fmt(receitaMesAtual)}</div></div>
     <div class="stat-card"><div class="stat-label">Vs Mês Anterior</div><div class="stat-val val-money" style="color:${varColor}">${varText}</div></div>
-    <div class="stat-card"><div class="stat-label">Demandas Abertas</div><div class="stat-val val-blue">${demandasAbertas}</div></div>
+    <div class="stat-card"><div class="stat-label">Lançamentos Pendentes</div><div class="stat-val val-yellow">${pendentesAvulsos.length}</div></div>
   `;
 
-  const now = new Date(); now.setHours(0,0,0,0);
-  let openDemands = S.demands.filter(d => d.status !== 'concluido' && d.due).map(d => {
-    const dDate = new Date(d.due + 'T00:00:00');
-    const diffDays = Math.round((dDate - now) / (1000 * 60 * 60 * 24));
-    return {...d, diffDays};
-  }).sort((a,b) => a.diffDays - b.diffDays);
-
-  let demandsHtml = '';
-  if(openDemands.length > 0) {
-    demandsHtml += `<table style="font-size:12px"><tbody>`;
-    openDemands.slice(0, 5).forEach(d => {
-      const c = gc(d.clientId);
-      let flag = '';
-      if(d.diffDays < 0) flag = `<span class="badge badge-red">Atrasado (${Math.abs(d.diffDays)}d)</span>`;
-      else if (d.diffDays === 0) flag = `<span class="badge badge-yellow">Vence Hoje</span>`;
-      else flag = `<span style="color:var(--text3)">em ${d.diffDays} dias</span>`;
-
-      demandsHtml += `<tr>
-        <td style="padding:10px; border-bottom:1px solid var(--border)">
-          <div style="font-weight:500">${d.title}</div>
-          <div style="margin-top:4px"><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></div>
-        </td>
-        <td style="text-align:right; padding:10px; border-bottom:1px solid var(--border)">${flag}</td>
-      </tr>`;
-    });
-    demandsHtml += `</tbody></table>`;
-  } else {
-    demandsHtml = `<div class="empty-state" style="padding:20px">Tudo em dia! Nenhuma demanda urgente.</div>`;
-  }
-  document.getElementById('home-demands').innerHTML = demandsHtml;
-
+  // Lista de devedores (Mensalidade + Avulso)
   let aReceberHtml = '';
-  const clientsPendent = S.clients.map(c => {
-    const data = calcClientMonthData(c.id, currMonth);
-    return { ...c, remaining: data.remaining };
-  }).filter(c => c.remaining > 0).sort((a,b) => b.remaining - a.remaining);
+  // Combina dívida de mensalidade + dívida avulsa por cliente
+  const mapDevedores = {};
+  
+  S.clients.forEach(c => {
+    const d = calcClientMonthData(c.id, currMonth);
+    if(d.remaining > 0) mapDevedores[c.id] = { c, total: d.remaining };
+  });
+
+  pendentesAvulsos.forEach(e => {
+      if(!mapDevedores[e.clientId]) mapDevedores[e.clientId] = { c: gc(e.clientId), total: 0 };
+      mapDevedores[e.clientId].total += (e.price * e.qty);
+  });
+
+  const clientsPendent = Object.values(mapDevedores).sort((a,b) => b.total - a.total);
 
   if(clientsPendent.length > 0) {
     aReceberHtml += `<table style="font-size:12px"><tbody>`;
-    clientsPendent.forEach(c => {
+    clientsPendent.forEach(item => {
       aReceberHtml += `<tr>
-        <td style="padding:10px; border-bottom:1px solid var(--border)"><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></td>
-        <td class="val-money val-red" style="text-align:right; font-family:'DM Mono',monospace; padding:10px; border-bottom:1px solid var(--border)">${fmt(c.remaining)}</td>
+        <td style="padding:10px; border-bottom:1px solid var(--border)"><span class="chip"><span class="chip-dot" style="background:${item.c.color}"></span>${item.c.name}</span></td>
+        <td class="val-money val-red" style="text-align:right; font-family:'DM Mono',monospace; padding:10px; border-bottom:1px solid var(--border)">${fmt(item.total)}</td>
       </tr>`;
     });
     aReceberHtml += `</tbody></table>`;
@@ -430,6 +527,45 @@ function renderHome() {
     aReceberHtml = `<div class="empty-state" style="padding:20px">Nada a receber neste mês. Tudo pago!</div>`;
   }
   document.getElementById('home-receivables').innerHTML = aReceberHtml;
+
+  // Gráfico (Últimos 6 meses)
+  renderChart();
+}
+
+function renderChart() {
+  const el = document.getElementById('finance-chart');
+  const meses = [];
+  const valores = [];
+  
+  // Pegar os últimos 6 meses (incluindo o atual)
+  for (let i = 5; i >= 0; i--) {
+      let d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const mk = getMonthKey(d);
+      const nomeMes = d.toLocaleString('pt-BR', { month: 'short' }).replace('.','').toUpperCase();
+      
+      const rec = S.entries.filter(e => e.status === 'recebido' && e.date.startsWith(mk))
+                           .reduce((s, e) => s + (e.price * e.qty), 0);
+      
+      meses.push(nomeMes);
+      valores.push(rec);
+  }
+
+  const maxVal = Math.max(...valores, 100); // Evitar div por zero
+
+  let html = `<div class="chart-container">`;
+  for(let i=0; i < 6; i++) {
+      const heightPercent = Math.max(5, (valores[i] / maxVal) * 100); // Min 5% para aparecer algo
+      html += `
+        <div class="chart-col">
+            <div class="chart-val val-money">${valores[i] > 0 ? 'R$ '+valores[i] : ''}</div>
+            <div class="chart-bar" style="height: ${heightPercent}%"></div>
+            <div class="chart-label">${meses[i]}</div>
+        </div>
+      `;
+  }
+  html += `</div>`;
+  el.innerHTML = html;
 }
 
 // ─── KANBAN ────────────────────────────────────────────────────────────────
@@ -547,7 +683,7 @@ function openClientModal(id = null) {
     </div>
     <div class="form-row form-row-2">
       <div class="form-group"><label>Nome</label><input id="cl-name" value="${c ? c.name : ''}"></div>
-      <div class="form-group"><label>Cor (Identificação)</label><input type="color" id="cl-color" value="${c ? c.color : '#5c9eff'}" style="height:38px; padding:2px"></div>
+      <div class="form-group"><label>Cor (Identificação)</label><input type="color" id="cl-color" value="${c ? c.color : '#ff8a00'}" style="height:38px; padding:2px"></div>
     </div>
     <div class="form-group"><label>Valor Mensal (R$)</label><input type="number" id="cl-fee" value="${c ? (c.monthlyFee||0) : 0}" step="0.01"></div>
     <div class="modal-footer">
@@ -622,7 +758,7 @@ function openQuickClientModal() {
 function saveQuickClient() {
   const name = document.getElementById('quick-cl-name').value.trim();
   if(!name) return;
-  const newClient = { id: uid(), name, color: '#c8f55a', monthlyFee: 0 };
+  const newClient = { id: uid(), name, color: '#ff8a00', monthlyFee: 0 };
   S.clients.push(newClient);
   saveData();
 
