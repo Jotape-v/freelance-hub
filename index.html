@@ -33,26 +33,34 @@ html, body { background: var(--bg); color: var(--text); min-height: 100vh; font-
 
 /* Layout & Utils */
 .shell { display: flex; min-height: 100vh; }
-.sidebar { width: 220px; min-width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; z-index: 10; }
-.main { flex: 1; overflow: auto; position: relative; }
-.sync-badge { position: absolute; top: 12px; right: 36px; font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; z-index: 10; }
+.sidebar { width: 220px; min-width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; z-index: 1000; transition: transform 0.3s ease; }
+.main { flex: 1; overflow: auto; position: relative; width: 100%; }
+.sync-badge { position: absolute; top: 12px; right: 36px; font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; z-index: 10; transition: all 0.3s; }
 .sync-badge.syncing { color: var(--yellow); }
 .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 .syncing .sync-dot { background: var(--yellow); animation: pulse 1s infinite; }
 @keyframes pulse { 0% { opacity: .5; } 50% { opacity: 1; } 100% { opacity: .5; } }
 
-/* Sidebar */
+/* Sidebar & Mobile Overlay */
 .logo { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); }
 .logo-mark { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
 .logo-mark span { color: var(--accent); }
 .logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
-.nav { padding: 16px 12px; flex: 1; }
+.nav { padding: 16px 12px; flex: 1; overflow-y: auto; }
 .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text2); font-size: 13px; font-weight: 400; transition: all .15s; border: none; background: none; width: 100%; text-align: left; }
 .nav-item:hover { background: var(--bg3); color: var(--text); }
 .nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 500; }
 .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
 .nav-section { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; padding: 16px 10px 6px; font-family: 'DM Mono', monospace; }
 .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+
+/* Mobile Header */
+.mobile-header { display: none; background: var(--bg2); padding: 16px 20px; border-bottom: 1px solid var(--border); align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 900; }
+.mobile-header-logo { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+.mobile-header-logo span { color: var(--accent); }
+.mobile-menu-btn { background: none; border: none; color: var(--text); padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.mobile-menu-btn svg { width: 24px; height: 24px; }
+.sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 990; backdrop-filter: blur(2px); transition: opacity 0.3s; opacity: 0; pointer-events: none; }
 
 /* Pages */
 .page { display: none; padding: 32px 36px; }
@@ -64,13 +72,14 @@ html, body { background: var(--bg); color: var(--text); min-height: 100vh; font-
 
 /* Cards & Grid */
 .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+.home-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; }
 .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
 .stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; font-family: 'DM Mono', monospace; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 .stat-val { font-size: 24px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -1px; }
 .val-accent { color: var(--accent); } .val-green { color: var(--green); } .val-red { color: var(--red); } .val-blue { color: var(--blue); } .val-yellow { color: var(--yellow); }
 
 /* UI Elements */
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); cursor: pointer; font-size: 13px; transition: all .15s; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); cursor: pointer; font-size: 13px; transition: all .15s; justify-content: center;}
 .btn:hover { background: var(--bg4); border-color: var(--border2); }
 .btn-accent { background: var(--accent); color: var(--accent-text); border-color: transparent; font-weight: 600; }
 .btn-accent:hover { opacity: 0.9; }
@@ -86,13 +95,13 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em; font-family: 'DM Mono', monospace; }
 .form-group { margin-bottom: 14px; }
 .form-row { display: grid; gap: 12px; } .form-row-2 { grid-template-columns: 1fr 1fr; } .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
-.table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: collapse; }
-th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; background: var(--bg2); }
+th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; background: var(--bg2); white-space: nowrap; }
 td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 13px; }
-.chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 5px; border-radius: 20px; font-size: 11px; background: var(--bg4); border: 1px solid var(--border); }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 5px; border-radius: 20px; font-size: 11px; background: var(--bg4); border: 1px solid var(--border); white-space: nowrap; }
 .chip-dot { width: 7px; height: 7px; border-radius: 50%; }
-.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
 .badge::before { content:''; width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
 .badge-green { background: var(--green-dim); color: var(--green); } .badge-green::before { background: var(--green); }
 .badge-red { background: var(--red-dim); color: var(--red); } .badge-red::before { background: var(--red); }
@@ -101,8 +110,8 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
 .empty-state { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 13px; }
 
 /* Modals */
-.modal-overlay, .modal-overlay-quick { position: fixed; inset: 0; background: rgba(0,0,0,.65); display: flex; align-items: center; justify-content: center; z-index: 200; backdrop-filter: blur(3px); }
-.modal-overlay-quick { z-index: 300; }
+.modal-overlay, .modal-overlay-quick { position: fixed; inset: 0; background: rgba(0,0,0,.65); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
+.modal-overlay-quick { z-index: 3000; }
 .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; padding: 28px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
 .modal-sm { width: 400px; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
@@ -110,7 +119,7 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
 .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
 
 /* Kanban / Demandas */
-.kanban-wrap { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; align-items: flex-start; }
+.kanban-wrap { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; align-items: flex-start; -webkit-overflow-scrolling: touch; }
 .kanban-col { min-width: 270px; width: 270px; flex-shrink: 0; }
 .kanban-col-head { display: flex; justify-content: space-between; padding: 0 2px 12px; }
 .kanban-col-title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text2); font-family: 'DM Mono', monospace; }
@@ -130,9 +139,9 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
 
 /* Sections */
 .section-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; height: 100%; }
-.section-box-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.section-box-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
 .quick-add-wrap { display: flex; gap: 8px; }
-.quick-add-btn { background: var(--bg4); border: 1px solid var(--border); color: var(--text); border-radius: 6px; width: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.quick-add-btn { background: var(--bg4); border: 1px solid var(--border); color: var(--text); border-radius: 6px; width: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;}
 .quick-add-btn:hover { background: var(--bg3); color: var(--accent); }
 
 /* Custom Chart CSS */
@@ -143,11 +152,55 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
 .chart-bar:hover { filter: brightness(1.2); }
 .chart-val { position: absolute; top: -20px; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text); white-space: nowrap; }
 .chart-label { margin-top: 8px; font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; text-transform: uppercase; }
+
+/* ==========================================================
+   RESPONSIVIDADE (MOBILE)
+========================================================== */
+@media (max-width: 768px) {
+  /* Sidebar Off-canvas */
+  .mobile-header { display: flex; }
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); box-shadow: 4px 0 15px rgba(0,0,0,0.5); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay.open { opacity: 1; pointer-events: all; }
+  
+  /* Páginas & Grids */
+  .page { padding: 24px 20px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+  .page-header .btn { width: 100%; }
+  
+  .stat-grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px;}
+  .home-grid { grid-template-columns: 1fr !important; gap: 16px; }
+  
+  .form-row-2, .form-row-3 { grid-template-columns: 1fr; gap: 0; }
+  
+  table { min-width: 650px; } /* Força Scroll horizontal em tabelas no celular */
+  
+  /* Modais */
+  .modal { padding: 20px; width: 92vw; }
+  .modal-header { margin-bottom: 16px; }
+  .modal-footer { flex-direction: column; gap: 10px; margin-top: 16px; padding-top: 16px;}
+  .modal-footer .btn { width: 100%; margin: 0 !important; }
+  
+  /* Sync Badge */
+  .sync-badge { top: auto; bottom: 16px; right: 16px; background: var(--bg3); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+  
+  /* Chart */
+  .chart-container { height: 130px; padding: 20px 10px 10px; gap: 6px; margin-bottom: 20px;}
+  .chart-val { font-size: 9px; top: -16px; }
+  .chart-label { font-size: 9px; margin-top: 6px;}
+
+  /* Kanban touch fix */
+  .kanban-card-actions { opacity: 1; } /* Sempre visível no celular */
+  .kanban-move-btn { padding: 6px 12px; font-size: 14px; background: var(--bg3); }
+}
 </style>
 </head>
 <body>
 
 <div class="shell">
+
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
   <aside class="sidebar">
     <div class="logo">
       <div class="logo-mark">Umi<span>Desk</span></div>
@@ -188,6 +241,14 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
   </aside>
 
   <main class="main">
+    
+    <div class="mobile-header">
+      <div class="mobile-header-logo">Umi<span>Desk</span></div>
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+    </div>
+
     <div id="sync-status" class="sync-badge"><div class="sync-dot"></div>Sincronizado</div>
 
     <div class="page active" id="page-home">
@@ -201,7 +262,7 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
       
       <div class="stat-grid" id="home-prod-stats"></div>
 
-      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px">
+      <div class="home-grid">
         <div class="section-box">
           <div class="section-box-head">
             <span class="section-box-title" style="font-weight:600">🎯 Foco do Dia (Atrasadas / Hoje)</span>
@@ -212,7 +273,7 @@ td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align:
         
         <div class="section-box">
           <div class="section-box-head">
-            <span class="section-box-title" style="font-weight:600">🔜 Próximas Entregas</span>
+            <span class="section-box-title" style="font-weight:600">🔜 Próximas</span>
           </div>
           <div id="home-next-demands"></div>
         </div>
@@ -285,6 +346,7 @@ const BIN_ID = '69c5c9cfaa77b81da923335f';
 const API_KEY = '$2a$10$JoXBCMxsjxa4gCJ1SioEBOQ4JlNDa3VbQpbjWqzQch2Af.2bDQ9ae';
 
 let S = {
+  user: { name: 'Gestor' },
   clients: [], services: [], entries: [], demands: [], clientPrices: [], nextId: 1
 };
 
@@ -304,6 +366,7 @@ async function loadData() {
     if(res.ok) {
       const data = await res.json();
       if(data.record) { 
+        S.user = data.record.user || { name: 'Gestor' };
         S.clients = data.record.clients || [];
         S.services = data.record.services || [];
         S.entries = data.record.entries || [];
@@ -343,6 +406,11 @@ function getGreeting() {
   return 'Boa noite';
 }
 
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('open');
+}
+
 let isValuesHidden = false;
 function toggleHideValues() {
   isValuesHidden = !isValuesHidden;
@@ -351,7 +419,7 @@ function toggleHideValues() {
 }
 
 function getMonthKey(dateObj = new Date()) {
-  return dateObj.toISOString().slice(0,7); // YYYY-MM
+  return dateObj.toISOString().slice(0,7); 
 }
 
 function calcClientMonthData(clientId, monthKey = getMonthKey()) {
@@ -378,6 +446,13 @@ function goPage(name, el) {
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   if(el) el.classList.add('active');
+  
+  // Fechar sidebar no mobile após clique
+  const sidebar = document.querySelector('.sidebar');
+  if(sidebar.classList.contains('open')) {
+    toggleSidebar();
+  }
+  
   renderApp();
 }
 
@@ -413,14 +488,13 @@ function renderHomeProdutividade() {
     <div class="stat-card"><div class="stat-label">Atrasadas</div><div class="stat-val ${atrasadas > 0 ? 'val-red' : ''}">${atrasadas}</div></div>
     <div class="stat-card"><div class="stat-label">Vence Hoje</div><div class="stat-val ${venceHoje > 0 ? 'val-yellow' : ''}">${venceHoje}</div></div>
     <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-val val-blue">${emAndamento}</div></div>
-    <div class="stat-card"><div class="stat-label">Aguardando Revisão</div><div class="stat-val" style="color:#ffd166">${revisao}</div></div>
+    <div class="stat-card"><div class="stat-label">Aguard. Revisão</div><div class="stat-val" style="color:#ffd166">${revisao}</div></div>
   `;
 
-  // Listar Urgentes (Atrasadas e Hoje)
   const urgentes = openDemands.filter(d => d.diffDays !== null && d.diffDays <= 0).sort((a,b) => a.diffDays - b.diffDays);
   let urgHtml = '';
   if(urgentes.length > 0) {
-    urgHtml += `<table style="font-size:12px"><tbody>`;
+    urgHtml += `<div class="table-wrap"><table><tbody>`;
     urgentes.forEach(d => {
       const c = gc(d.clientId);
       const flag = d.diffDays < 0 ? `<span class="badge badge-red">Atrasado (${Math.abs(d.diffDays)}d)</span>` : `<span class="badge badge-yellow">Vence Hoje</span>`;
@@ -432,17 +506,16 @@ function renderHomeProdutividade() {
         <td style="text-align:right; padding:10px; border-bottom:1px solid var(--border)">${flag}</td>
       </tr>`;
     });
-    urgHtml += `</tbody></table>`;
+    urgHtml += `</tbody></table></div>`;
   } else {
     urgHtml = `<div class="empty-state" style="padding:20px">Mandou bem! Nenhuma entrega atrasada ou para hoje.</div>`;
   }
   document.getElementById('home-urgent-demands').innerHTML = urgHtml;
 
-  // Listar Próximas (Em breve)
   const proximas = openDemands.filter(d => d.diffDays !== null && d.diffDays > 0).sort((a,b) => a.diffDays - b.diffDays).slice(0, 5);
   let proxHtml = '';
   if(proximas.length > 0) {
-    proxHtml += `<table style="font-size:12px"><tbody>`;
+    proxHtml += `<div class="table-wrap"><table><tbody>`;
     proximas.forEach(d => {
       const c = gc(d.clientId);
       proxHtml += `<tr style="cursor:pointer" onclick="openDemandModal(${d.id})">
@@ -453,14 +526,14 @@ function renderHomeProdutividade() {
         <td style="text-align:right; padding:10px; border-bottom:1px solid var(--border)"><span style="color:var(--text3); font-family:'DM Mono', monospace">em ${d.diffDays} dias</span></td>
       </tr>`;
     });
-    proxHtml += `</tbody></table>`;
+    proxHtml += `</tbody></table></div>`;
   } else {
     proxHtml = `<div class="empty-state" style="padding:20px">Nenhuma entrega com prazo futuro definida.</div>`;
   }
   document.getElementById('home-next-demands').innerHTML = proxHtml;
 }
 
-// ─── 2. DASHBOARD FINANCEIRO (NOVA ABA) ────────────────────────────────────
+// ─── 2. DASHBOARD FINANCEIRO ───────────────────────────────────────────────
 function renderFinanceiroDash() {
   const currMonth = getMonthKey();
   let lastMonthDate = new Date(); lastMonthDate.setMonth(lastMonthDate.getMonth()-1);
@@ -491,14 +564,13 @@ function renderFinanceiroDash() {
 
   document.getElementById('home-stats').innerHTML = `
     <div class="stat-card"><div class="stat-label">MRR (Contratos)</div><div class="stat-val val-money val-accent">${fmt(MRR)}</div></div>
-    <div class="stat-card"><div class="stat-label">Previsão Fixa do Mês</div><div class="stat-val val-money">${fmt(previsao)}</div></div>
-    <div class="stat-card"><div class="stat-label">A Receber no Mês (Total)</div><div class="stat-val val-money val-red">${fmt(totalReceberMes)}</div></div>
+    <div class="stat-card"><div class="stat-label">Previsão Fixa Mês</div><div class="stat-val val-money">${fmt(previsao)}</div></div>
+    <div class="stat-card"><div class="stat-label">A Receber Total Mês</div><div class="stat-val val-money val-red">${fmt(totalReceberMes)}</div></div>
     <div class="stat-card"><div class="stat-label">Receita do Mês</div><div class="stat-val val-money val-green">${fmt(receitaMesAtual)}</div></div>
     <div class="stat-card"><div class="stat-label">Vs Mês Anterior</div><div class="stat-val val-money" style="color:${varColor}">${varText}</div></div>
-    <div class="stat-card"><div class="stat-label">Lançamentos Pendentes</div><div class="stat-val val-yellow">${pendentesAvulsos.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Extras Pendentes</div><div class="stat-val val-yellow">${pendentesAvulsos.length}</div></div>
   `;
 
-  // Lista de devedores (Mensalidade + Avulso)
   let aReceberHtml = '';
   const mapDevedores = {};
   
@@ -515,20 +587,19 @@ function renderFinanceiroDash() {
   const clientsPendent = Object.values(mapDevedores).sort((a,b) => b.total - a.total);
 
   if(clientsPendent.length > 0) {
-    aReceberHtml += `<table style="font-size:12px"><tbody>`;
+    aReceberHtml += `<div class="table-wrap"><table><tbody>`;
     clientsPendent.forEach(item => {
       aReceberHtml += `<tr>
         <td style="padding:10px; border-bottom:1px solid var(--border)"><span class="chip"><span class="chip-dot" style="background:${item.c.color}"></span>${item.c.name}</span></td>
         <td class="val-money val-red" style="text-align:right; font-family:'DM Mono',monospace; padding:10px; border-bottom:1px solid var(--border)">${fmt(item.total)}</td>
       </tr>`;
     });
-    aReceberHtml += `</tbody></table>`;
+    aReceberHtml += `</tbody></table></div>`;
   } else {
     aReceberHtml = `<div class="empty-state" style="padding:20px">Nada a receber neste mês. Tudo pago!</div>`;
   }
   document.getElementById('home-receivables').innerHTML = aReceberHtml;
 
-  // Gráfico (Últimos 6 meses)
   renderChart();
 }
 
@@ -658,7 +729,7 @@ function renderClientes() {
       <td class="val-money val-green" style="font-family:'DM Mono',monospace">${fmt(data.paidThisMonth)}</td>
       <td class="val-money" style="font-family:'DM Mono',monospace; color:${data.remaining > 0 ? 'var(--red)' : 'var(--text3)'}">${fmt(data.remaining)}</td>
       <td><span class="badge ${badgeClass}">${data.status}</span></td>
-      <td style="display:flex; gap:6px;">
+      <td style="display:flex; gap:6px; flex-wrap: wrap;">
         ${data.remaining > 0 ? `<button class="btn btn-sm btn-accent" style="color:var(--bg)" onclick="payMonthlyFee(${c.id})">Baixar Mês</button>` : ''}
         <button class="btn btn-sm btn-ghost" onclick="openClientModal(${c.id})">Editar</button>
         <button class="btn btn-sm btn-danger" onclick="confirmAction('Remover cliente <b>${c.name}</b> e todo seu histórico?', () => deleteClient(${c.id}))">Excluir</button>
@@ -718,7 +789,6 @@ function payMonthlyFee(clientId) {
         S.services.push(svc);
       }
       
-      // ABRE O MODAL PREENCHIDO COM O VALOR RESTANTE. (Pode ser editado para pagamentos parciais).
       openEntryModal(null, {
         clientId: clientId,
         serviceId: svc.id,
@@ -791,7 +861,7 @@ function renderFinanceiro() {
       <td>${sv.name} ${e.qty > 1 ? `<span style="color:var(--text3); font-size:11px">x${e.qty}</span>` : ''} ${e.desc ? `<span style="color:var(--text3)">— ${e.desc}</span>`:''}</td>
       <td class="val-money" style="font-family:'DM Mono',monospace; font-weight:500">${fmt(e.price * e.qty)}</td>
       <td><span class="badge ${badge}" style="cursor:pointer" onclick="toggleEntryStatus(${e.id})" title="Clique para alternar status">${e.status.toUpperCase()}</span></td>
-      <td style="display:flex; gap:6px;">
+      <td style="display:flex; gap:6px; flex-wrap: wrap;">
         <button class="btn btn-sm btn-ghost" onclick="openEntryModal(${e.id})">Editar</button>
         <button class="btn btn-sm btn-danger" onclick="confirmAction('Remover este lançamento?', () => deleteEntry(${e.id}))">✕</button>
       </td>
@@ -933,7 +1003,7 @@ function renderServicos() {
     <thead><tr><th>Nome do Serviço</th><th>Preço Padrão</th><th>Ações</th></tr></thead>
     <tbody>${S.services.map(s => `<tr>
       <td>${s.name}</td><td class="val-money" style="font-family:'DM Mono',monospace">${fmt(s.price)}</td>
-      <td style="display:flex; gap:6px;">
+      <td style="display:flex; gap:6px; flex-wrap: wrap;">
         <button class="btn btn-sm btn-ghost" onclick="openServiceModal(${s.id})">Editar</button>
         <button class="btn btn-sm btn-danger" onclick="confirmAction('Remover serviço?', () => deleteService(${s.id}))">Excluir</button>
       </td>
