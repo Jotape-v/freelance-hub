@@ -262,7 +262,16 @@ async function loadData() {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
     if(res.ok) {
       const data = await res.json();
-      if(data.record && data.record.clients) { S = data.record; }
+      if(data.record) { 
+        // A trava de segurança! Preenche os vazios se a base de dados for de uma versão antiga.
+        S.user = data.record.user || { name: 'Gestor' };
+        S.clients = data.record.clients || [];
+        S.services = data.record.services || [];
+        S.entries = data.record.entries || [];
+        S.demands = data.record.demands || [];
+        S.clientPrices = data.record.clientPrices || [];
+        S.nextId = data.record.nextId || 20;
+      }
     }
   } catch(e) { console.error('Load Error:', e); }
   setSyncing(false);
@@ -336,7 +345,7 @@ function renderApp() {
 
 // ─── 1. & 10. HOME / DASHBOARD ─────────────────────────────────────────────
 function renderHome() {
-  document.getElementById('home-greeting').innerHTML = `Olá, ${S.user.name||'Gestor'} 👋`;
+  document.getElementById('home-greeting').innerHTML = `Olá, ${S.user.name} 👋`;
 
   const currMonth = getMonthKey();
   let lastMonthDate = new Date(); lastMonthDate.setMonth(lastMonthDate.getMonth()-1);
@@ -376,4 +385,526 @@ function renderHome() {
     const dDate = new Date(d.due + 'T00:00:00');
     const diffDays = Math.round((dDate - now) / (1000 * 60 * 60 * 24));
     return {...d, diffDays};
-  }).sort((a,b) => a.
+  }).sort((a,b) => a.diffDays - b.diffDays);
+
+  let demandsHtml = '';
+  if(openDemands.length > 0) {
+    demandsHtml += `<table style="font-size:12px"><tbody>`;
+    openDemands.slice(0, 5).forEach(d => {
+      const c = gc(d.clientId);
+      let flag = '';
+      if(d.diffDays < 0) flag = `<span class="badge badge-red">Atrasado (${Math.abs(d.diffDays)}d)</span>`;
+      else if (d.diffDays === 0) flag = `<span class="badge badge-yellow">Vence Hoje</span>`;
+      else flag = `<span style="color:var(--text3)">em ${d.diffDays} dias</span>`;
+
+      demandsHtml += `<tr>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">
+          <div style="font-weight:500">${d.title}</div>
+          <div style="margin-top:4px"><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></div>
+        </td>
+        <td style="text-align:right; padding:10px; border-bottom:1px solid var(--border)">${flag}</td>
+      </tr>`;
+    });
+    demandsHtml += `</tbody></table>`;
+  } else {
+    demandsHtml = `<div class="empty-state" style="padding:20px">Tudo em dia! Nenhuma demanda urgente.</div>`;
+  }
+  document.getElementById('home-demands').innerHTML = demandsHtml;
+
+  let aReceberHtml = '';
+  const clientsPendent = S.clients.map(c => {
+    const data = calcClientMonthData(c.id, currMonth);
+    return { ...c, remaining: data.remaining };
+  }).filter(c => c.remaining > 0).sort((a,b) => b.remaining - a.remaining);
+
+  if(clientsPendent.length > 0) {
+    aReceberHtml += `<table style="font-size:12px"><tbody>`;
+    clientsPendent.forEach(c => {
+      aReceberHtml += `<tr>
+        <td style="padding:10px; border-bottom:1px solid var(--border)"><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></td>
+        <td class="val-money val-red" style="text-align:right; font-family:'DM Mono',monospace; padding:10px; border-bottom:1px solid var(--border)">${fmt(c.remaining)}</td>
+      </tr>`;
+    });
+    aReceberHtml += `</tbody></table>`;
+  } else {
+    aReceberHtml = `<div class="empty-state" style="padding:20px">Nada a receber neste mês. Tudo pago!</div>`;
+  }
+  document.getElementById('home-receivables').innerHTML = aReceberHtml;
+}
+
+// ─── KANBAN ────────────────────────────────────────────────────────────────
+const COLS = [
+  {key:'a_fazer', label:'A Fazer', color:'#555'},
+  {key:'em_andamento', label:'Em Andamento', color:'#5c9eff'},
+  {key:'revisao', label:'Revisão', color:'#ffd166'},
+  {key:'concluido', label:'Concluído', color:'#5cffa0'},
+];
+
+function renderKanban() {
+  const board = document.getElementById('kanban-board');
+  const now = new Date(); now.setHours(0,0,0,0);
+
+  let openDemands = S.demands.map(d => {
+    let diffDays = null;
+    if(d.due) {
+      const dDate = new Date(d.due + 'T00:00:00');
+      diffDays = Math.round((dDate - now) / (1000 * 60 * 60 * 24));
+    }
+    return {...d, diffDays};
+  });
+  
+  openDemands.sort((a,b) => (a.diffDays === null ? 999 : a.diffDays) - (b.diffDays === null ? 999 : b.diffDays));
+
+  board.innerHTML = COLS.map(col => {
+    const cards = openDemands.filter(d=>d.status===col.key);
+    const colIdx = COLS.findIndex(c=>c.key===col.key);
+    const canBack = colIdx > 0;
+    const canFwd = colIdx < COLS.length - 1;
+
+    return `
+    <div class="kanban-col">
+      <div class="kanban-col-head">
+        <span class="kanban-col-title"><span class="kanban-col-dot" style="background:${col.color};display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px"></span>${col.label}</span>
+        <span class="badge badge-gray">${cards.length}</span>
+      </div>
+      <div class="kanban-cards">
+        ${cards.map(d => {
+          const c = gc(d.clientId);
+          let extraClass = ''; let dateLabel = '';
+          if(d.diffDays !== null && d.status !== 'concluido') {
+            if(d.diffDays < 0) { extraClass = 'atrasado'; dateLabel = `<span style="color:var(--red)">Atrasado ${Math.abs(d.diffDays)}d</span>`; }
+            else if(d.diffDays === 0) { extraClass = 'hoje'; dateLabel = `<span style="color:var(--yellow)">Vence Hoje</span>`; }
+            else { dateLabel = `em ${d.diffDays}d`; }
+          }
+          return `<div class="kanban-card ${extraClass}" onclick="openDemandModal(${d.id})">
+            <div class="kanban-card-title">${d.title}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px">
+              <span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span>
+            </div>
+            <div class="kanban-card-footer" onclick="event.stopPropagation()">
+              <span style="font-family:'DM Mono',monospace">${dateLabel}</span>
+              <div class="kanban-card-actions">
+                ${canBack ? `<button class="kanban-move-btn" onclick="moveDemand(${d.id}, -1)">←</button>` : ''}
+                ${canFwd ? `<button class="kanban-move-btn" onclick="moveDemand(${d.id}, 1)">→</button>` : ''}
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function moveDemand(id, dir) {
+  const d = gd(id);
+  if(!d) return;
+  const idx = COLS.findIndex(c=>c.key===d.status);
+  const next = COLS[idx+dir];
+  if(next) { d.status = next.key; saveData(); renderApp(); }
+}
+
+// ─── CLIENTES E MENSALIDADES ───────────────────────────────────────────────
+function renderClientes() {
+  const el = document.getElementById('clients-list');
+  if(!S.clients.length) { el.innerHTML='<div class="empty-state">Nenhum cliente cadastrado.</div>'; return; }
+
+  const currMonth = getMonthKey();
+  let html = `<div class="table-wrap"><table>
+    <thead><tr><th>Cliente</th><th>Valor Mensal</th><th>Pago no Mês</th><th>Restante (Mês)</th><th>Status Mês</th><th>Ações</th></tr></thead>
+    <tbody>`;
+
+  S.clients.forEach(c => {
+    const data = calcClientMonthData(c.id, currMonth);
+    let badgeClass = 'badge-gray';
+    if(data.status === 'Pago' || data.status === 'Extra Pago') badgeClass = 'badge-green';
+    if(data.status === 'Parcial') badgeClass = 'badge-yellow';
+    if(data.status === 'Pendente') badgeClass = 'badge-red';
+
+    html += `<tr>
+      <td><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></td>
+      <td class="val-money" style="font-family:'DM Mono',monospace">${fmt(c.monthlyFee || 0)}</td>
+      <td class="val-money val-green" style="font-family:'DM Mono',monospace">${fmt(data.paidThisMonth)}</td>
+      <td class="val-money" style="font-family:'DM Mono',monospace; color:${data.remaining > 0 ? 'var(--red)' : 'var(--text3)'}">${fmt(data.remaining)}</td>
+      <td><span class="badge ${badgeClass}">${data.status}</span></td>
+      <td style="display:flex; gap:6px;">
+        ${data.remaining > 0 ? `<button class="btn btn-sm btn-accent" style="color:var(--bg)" onclick="payMonthlyFee(${c.id})">Baixar Mês</button>` : ''}
+        <button class="btn btn-sm btn-ghost" onclick="openClientModal(${c.id})">Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmAction('Remover cliente <b>${c.name}</b> e todo seu histórico?', () => deleteClient(${c.id}))">Excluir</button>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+function openClientModal(id = null) {
+  const c = id ? gc(id) : null;
+  showModal(`
+    <div class="modal-header">
+      <div class="modal-title">${c ? 'Editar Cliente' : 'Novo Cliente'}</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Nome</label><input id="cl-name" value="${c ? c.name : ''}"></div>
+      <div class="form-group"><label>Cor (Identificação)</label><input type="color" id="cl-color" value="${c ? c.color : '#5c9eff'}" style="height:38px; padding:2px"></div>
+    </div>
+    <div class="form-group"><label>Valor Mensal (R$)</label><input type="number" id="cl-fee" value="${c ? (c.monthlyFee||0) : 0}" step="0.01"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveClient(${c ? c.id : 'null'})">Salvar</button>
+    </div>
+  `);
+  setTimeout(()=>document.getElementById('cl-name').focus(), 100);
+}
+
+function saveClient(id) {
+  id = id !== 'null' ? parseInt(id) : null;
+  const name = document.getElementById('cl-name').value.trim();
+  const color = document.getElementById('cl-color').value;
+  const monthlyFee = parseFloat(document.getElementById('cl-fee').value) || 0;
+  if(!name) return;
+
+  if(id) {
+    const c = S.clients.find(x=>x.id===id);
+    if(c) { c.name = name; c.color = color; c.monthlyFee = monthlyFee; }
+  } else {
+    S.clients.push({ id: uid(), name, color, monthlyFee });
+  }
+  saveData(); closeModal(); renderApp();
+}
+
+function payMonthlyFee(clientId) {
+  const c = gc(clientId);
+  const currMonth = getMonthKey();
+  const data = calcClientMonthData(clientId, currMonth);
+  
+  if(data.remaining > 0) {
+      let svc = S.services.find(s => s.name === 'Mensalidade');
+      if(!svc) {
+        svc = { id: uid(), name: 'Mensalidade', price: 0 };
+        S.services.push(svc);
+      }
+      S.entries.push({
+        id: uid(), clientId, serviceId: svc.id, qty: 1,
+        price: data.remaining, status: 'recebido',
+        date: new Date().toISOString().split('T')[0],
+        desc: 'Ref. Mensalidade ' + currMonth.split('-').reverse().join('/')
+      });
+      saveData(); renderApp();
+  }
+}
+
+function deleteClient(id) {
+  S.clients = S.clients.filter(c=>c.id!==id);
+  S.entries = S.entries.filter(e=>e.clientId!==id);
+  S.demands = S.demands.filter(d=>d.clientId!==id);
+  saveData(); renderApp();
+}
+
+// ─── CRIAÇÃO RÁPIDA DE CLIENTE ─────────────────────────────────────────────
+function openQuickClientModal() {
+  const mc = document.getElementById('quick-modal-container');
+  mc.innerHTML = `
+    <div class="modal-overlay-quick">
+      <div class="modal modal-sm">
+        <div class="modal-header"><div class="modal-title">Criação Rápida: Cliente</div></div>
+        <div class="form-group"><label>Nome do Cliente</label><input id="quick-cl-name" placeholder="Ex: Studio Z"></div>
+        <div class="modal-footer">
+          <button class="btn" onclick="document.getElementById('quick-modal-container').innerHTML=''">Cancelar</button>
+          <button class="btn btn-accent" onclick="saveQuickClient()">Criar e Selecionar</button>
+        </div>
+      </div>
+    </div>`;
+  setTimeout(()=>document.getElementById('quick-cl-name').focus(), 100);
+}
+
+function saveQuickClient() {
+  const name = document.getElementById('quick-cl-name').value.trim();
+  if(!name) return;
+  const newClient = { id: uid(), name, color: '#c8f55a', monthlyFee: 0 };
+  S.clients.push(newClient);
+  saveData();
+
+  const dmSelect = document.getElementById('dm-client');
+  if(dmSelect) { dmSelect.innerHTML += `<option value="${newClient.id}">${newClient.name}</option>`; dmSelect.value = newClient.id; }
+  const enSelect = document.getElementById('en-client');
+  if(enSelect) { enSelect.innerHTML += `<option value="${newClient.id}">${newClient.name}</option>`; enSelect.value = newClient.id; }
+
+  document.getElementById('quick-modal-container').innerHTML = '';
+}
+
+// ─── LANÇAMENTOS (FINANCEIRO) ──────────────────────────────────────────────
+function renderFinanceiro() {
+  const el = document.getElementById('entries-table');
+  if(!S.entries.length) { el.innerHTML='<div class="empty-state">Nenhum lançamento extra registrado.</div>'; return; }
+
+  const sorted = [...S.entries].sort((a,b) => b.date.localeCompare(a.date));
+
+  let html = `<div class="table-wrap"><table>
+    <thead><tr><th>Data</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
+    <tbody>`;
+
+  sorted.forEach(e => {
+    const c = gc(e.clientId); const sv = gs(e.serviceId);
+    const badge = e.status==='recebido' ? 'badge-green' : 'badge-yellow';
+    
+    html += `<tr>
+      <td style="font-family:'DM Mono',monospace">${e.date.split('-').reverse().join('/')}</td>
+      <td><span class="chip"><span class="chip-dot" style="background:${c.color}"></span>${c.name}</span></td>
+      <td>${sv.name} ${e.qty > 1 ? `<span style="color:var(--text3); font-size:11px">x${e.qty}</span>` : ''} ${e.desc ? `<span style="color:var(--text3)">— ${e.desc}</span>`:''}</td>
+      <td class="val-money" style="font-family:'DM Mono',monospace; font-weight:500">${fmt(e.price * e.qty)}</td>
+      <td><span class="badge ${badge}" style="cursor:pointer" onclick="toggleEntryStatus(${e.id})" title="Clique para alternar status">${e.status.toUpperCase()}</span></td>
+      <td style="display:flex; gap:6px;">
+        <button class="btn btn-sm btn-ghost" onclick="openEntryModal(${e.id})">Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmAction('Remover este lançamento?', () => deleteEntry(${e.id}))">✕</button>
+      </td>
+    </tr>`;
+  });
+  html += `</tbody></table></div>`;
+  el.innerHTML = html;
+}
+
+function openEntryModal(id = null) {
+  const e = id ? S.entries.find(x=>x.id===id) : null;
+  const clientOpts = S.clients.map(c=>`<option value="${c.id}" ${e&&e.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
+  const serviceOpts = S.services.map(s=>`<option value="${s.id}" ${e&&e.serviceId===s.id?'selected':''}>${s.name}</option>`).join('');
+
+  showModal(`
+    <div class="modal-header">
+      <div class="modal-title">${e ? 'Editar Lançamento' : 'Novo Lançamento Extra'}</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group">
+        <label>Cliente</label>
+        <div class="quick-add-wrap">
+          <select id="en-client" style="flex:1" onchange="fillPrice()">${clientOpts}</select>
+          <button class="quick-add-btn" title="Novo Cliente" onclick="openQuickClientModal()">+</button>
+        </div>
+      </div>
+      <div class="form-group"><label>Serviço</label><select id="en-service" onchange="fillPrice()">${serviceOpts}</select></div>
+    </div>
+    
+    <div class="form-row form-row-3">
+      <div class="form-group"><label>Valor unit. (R$)</label><input type="number" id="en-price" value="${e?e.price:''}"></div>
+      <div class="form-group"><label>Quantidade</label><input type="number" id="en-qty" value="${e?e.qty:1}" min="1"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="en-status">
+          <option value="pendente" ${e&&e.status==='pendente'?'selected':''}>Pendente</option>
+          <option value="recebido" ${e&&e.status==='recebido'?'selected':''}>Recebido</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Data Referência</label><input type="date" id="en-date" value="${e?e.date:new Date().toISOString().split('T')[0]}"></div>
+      <div class="form-group"><label>Descrição Curta</label><input type="text" id="en-desc" value="${e?e.desc:''}"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveEntry(${e?e.id:'null'})">${e ? 'Salvar Lançamento' : 'Registrar'}</button>
+    </div>
+  `);
+  if(!e) fillPrice();
+}
+
+function fillPrice() {
+  const sid = parseInt(document.getElementById('en-service')?.value);
+  if(!sid) return;
+  const sv = gs(sid);
+  if(document.getElementById('en-price')) document.getElementById('en-price').value = sv.price;
+}
+
+function saveEntry(id) {
+  id = id !== 'null' ? parseInt(id) : null;
+  const clientId = parseInt(document.getElementById('en-client').value);
+  const serviceId = parseInt(document.getElementById('en-service').value);
+  const price = parseFloat(document.getElementById('en-price').value) || 0;
+  const qty = parseInt(document.getElementById('en-qty').value) || 1;
+  const status = document.getElementById('en-status').value;
+  const date = document.getElementById('en-date').value;
+  const desc = document.getElementById('en-desc').value.trim();
+
+  if(id) {
+    const e = S.entries.find(x=>x.id===id);
+    if(e) { Object.assign(e, { clientId, serviceId, qty, price, status, date, desc }); }
+  } else {
+    S.entries.push({ id: uid(), clientId, serviceId, qty, price, status, date, desc });
+  }
+  saveData(); closeModal(); renderApp();
+}
+
+function toggleEntryStatus(id) {
+  const e = S.entries.find(x=>x.id===id);
+  if(e) { e.status = e.status === 'recebido' ? 'pendente' : 'recebido'; saveData(); renderApp(); }
+}
+function deleteEntry(id) { S.entries = S.entries.filter(e=>e.id!==id); saveData(); renderApp(); }
+
+// ─── DEMANDAS MODAL (KANBAN) ───────────────────────────────────────────────
+function openDemandModal(id = null) {
+  const d = id ? gd(id) : null;
+  const clientOpts = S.clients.map(c=>`<option value="${c.id}" ${d&&d.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
+  const colOpts = COLS.map(col=>`<option value="${col.key}" ${d&&d.status===col.key?'selected':''}>${col.label}</option>`).join('');
+
+  showModal(`
+    <div class="modal-header">
+      <div class="modal-title">${d ? 'Editar Demanda' : 'Nova Demanda'}</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group"><label>Título</label><input id="dm-title" value="${d?d.title:''}"></div>
+    <div class="form-row form-row-2">
+      <div class="form-group">
+        <label>Cliente</label>
+        <div class="quick-add-wrap">
+          <select id="dm-client" style="flex:1">${clientOpts}</select>
+          <button class="quick-add-btn" title="Novo Cliente" onclick="openQuickClientModal()">+</button>
+        </div>
+      </div>
+      <div class="form-group"><label>Status</label><select id="dm-status">${colOpts}</select></div>
+    </div>
+    <div class="form-group"><label>Prazo de Entrega</label><input type="date" id="dm-due" value="${d&&d.due?d.due:''}"></div>
+    <div class="modal-footer">
+      ${d ? `<button class="btn btn-danger" style="margin-right:auto" onclick="confirmAction('Excluir esta demanda?', () => { deleteDemand(${d.id}); closeModal(); })">Excluir Demanda</button>` : ''}
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveDemand(${d?d.id:'null'})">Salvar</button>
+    </div>
+  `);
+  setTimeout(()=>document.getElementById('dm-title').focus(), 100);
+}
+
+function saveDemand(id) {
+  const title = document.getElementById('dm-title').value.trim();
+  const clientId = parseInt(document.getElementById('dm-client').value);
+  const status = document.getElementById('dm-status').value;
+  const due = document.getElementById('dm-due').value;
+  if(!title) return;
+
+  if(id && id !== 'null') {
+    const d = gd(id); Object.assign(d, {title, clientId, status, due});
+  } else {
+    S.demands.push({ id: uid(), title, clientId, status, due });
+  }
+  saveData(); closeModal(); renderApp();
+}
+
+function deleteDemand(id) { S.demands = S.demands.filter(d=>d.id!==id); saveData(); renderApp(); }
+
+// ─── SERVIÇOS ──────────────────────────────────────────────────────────────
+function renderServicos() {
+  const el = document.getElementById('services-list');
+  el.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr><th>Nome do Serviço</th><th>Preço Padrão</th><th>Ações</th></tr></thead>
+    <tbody>${S.services.map(s => `<tr>
+      <td>${s.name}</td><td class="val-money" style="font-family:'DM Mono',monospace">${fmt(s.price)}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="confirmAction('Remover serviço?', () => deleteService(${s.id}))">Excluir</button></td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+function openServiceModal() {
+  showModal(`
+    <div class="modal-header"><div class="modal-title">Novo Serviço</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Nome</label><input id="sv-name"></div>
+      <div class="form-group"><label>Preço Padrão (R$)</label><input type="number" id="sv-price"></div>
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveService()">Criar</button></div>
+  `);
+}
+
+function saveService() {
+  const name = document.getElementById('sv-name').value.trim();
+  const price = parseFloat(document.getElementById('sv-price').value) || 0;
+  if(!name) return;
+  S.services.push({id:uid(), name, price});
+  saveData(); closeModal(); renderApp();
+}
+function deleteService(id) { S.services = S.services.filter(s=>s.id!==id); saveData(); renderApp(); }
+
+// ─── MODAL GLOBAL & ATALHOS ────────────────────────────────────────────────
+function showModal(html) {
+  document.getElementById('modal-container').innerHTML = `<div class="modal-overlay" onmousedown="if(event.target===this) closeModal()"><div class="modal">${html}</div></div>`;
+}
+function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
+
+let pendingConfirmAction = null;
+function confirmAction(msg, actionFn) {
+  pendingConfirmAction = actionFn;
+  showModal(`
+    <div class="modal-header"><div class="modal-title">Atenção</div></div>
+    <p style="font-size:14px; margin-bottom:20px">${msg}</p>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger" onclick="closeModal(); if(pendingConfirmAction) pendingConfirmAction(); pendingConfirmAction=null;">Confirmar Exclusão</button>
+    </div>
+  `);
+}
+
+document.addEventListener('keydown', e => {
+  const hasModal = document.getElementById('modal-container').innerHTML !== '' || document.getElementById('quick-modal-container').innerHTML !== '';
+  if (hasModal && e.key === 'Escape') {
+    if(document.getElementById('quick-modal-container').innerHTML !== '') document.getElementById('quick-modal-container').innerHTML = '';
+    else closeModal();
+  }
+  if (hasModal && e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    let container = document.getElementById('quick-modal-container').innerHTML !== '' ? document.getElementById('quick-modal-container') : document.getElementById('modal-container');
+    const primaryBtn = container.querySelector('.btn-accent, .btn-danger');
+    if (primaryBtn) primaryBtn.click();
+  }
+});
+
+// ─── LOGIN SYSTEM ──────────────────────────────────────────────────────────
+const SESSION_KEY = 'umidesk_auth';
+const PASSWORD_HASH = '323ef810dd19f40b77e63de99e457a172a477d36f3affd41305dd81deadc33a0';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function showLoginScreen() {
+  document.querySelector('.shell').style.display = 'none';
+  const login = document.createElement('div');
+  login.id = 'login-screen';
+  login.innerHTML = `
+    <style>
+      #login-screen { position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999; }
+      .login-box { background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:40px 36px;width:360px;text-align:center; }
+      .login-box input { background:var(--bg3);border:1px solid var(--border);color:var(--text); border-radius:8px;padding:11px 14px;font-size:14px;width:100%;margin-bottom:12px;text-align:center;letter-spacing:2px; }
+      .login-btn { width:100%;padding:11px;background:var(--accent);color:var(--accent-text);border:none;border-radius:8px;font-weight:600;cursor:pointer; }
+    </style>
+    <div class="login-box">
+      <div style="font-size:24px; font-weight:600; margin-bottom:20px">Umi<span style="color:var(--accent)">Desk</span></div>
+      <input type="password" id="login-input" placeholder="••••••••••" onkeydown="if(event.key==='Enter')tryLogin()">
+      <button class="login-btn" onclick="tryLogin()">Acessar Sistema</button>
+      <div id="login-err" style="color:var(--red); font-size:12px; margin-top:10px; min-height:15px"></div>
+    </div>
+  `;
+  document.body.appendChild(login);
+  setTimeout(()=>document.getElementById('login-input')?.focus(), 100);
+}
+
+async function tryLogin() {
+  const val = document.getElementById('login-input').value;
+  const hash = await sha256(val);
+  if(hash === PASSWORD_HASH) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('login-screen').remove();
+    document.querySelector('.shell').style.display = 'flex';
+    loadData(); 
+  } else {
+    document.getElementById('login-err').textContent = 'Senha incorreta.';
+    document.getElementById('login-input').value = '';
+  }
+}
+
+// ─── INITIALIZATION ────────────────────────────────────────────────────────
+if(sessionStorage.getItem(SESSION_KEY) === '1') {
+  loadData();
+} else {
+  showLoginScreen();
+}
+</script>
+</body>
+</html>
