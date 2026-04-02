@@ -139,6 +139,15 @@ td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle
   .kanban-card-actions{opacity:1}
   .kanban-move-btn{padding:6px 12px;font-size:14px;background:var(--bg3)}
 }
+.month-group { margin-bottom: 16px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg2); }
+.month-header { background: var(--bg3); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; transition: background .2s; }
+.month-header:hover { background: var(--bg4); }
+.month-title { font-weight: 600; font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.month-total { font-family: 'DM Mono', monospace; font-weight: 500; }
+.month-content { display: block; overflow-x: auto; }
+.month-group.collapsed .month-content { display: none; }
+.month-toggle-icon { transition: transform .2s; width: 14px; height: 14px; color: var(--text3); }
+.month-group.collapsed .month-toggle-icon { transform: rotate(-90deg); }
 </style>
 </head>
 <body>
@@ -221,6 +230,9 @@ td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle
 const BIN_ID='69c5c9cfaa77b81da923335f';
 const API_KEY='$2a$10$JoXBCMxsjxa4gCJ1SioEBOQ4JlNDa3VbQpbjWqzQch2Af.2bDQ9ae';
 let S={user:{name:'Gestor'},clients:[],services:[],entries:[],demands:[],clientPrices:[],nextId:1};
+const monthNamesLong=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+let collapsedMonths={};
+function toggleMonth(m){collapsedMonths[m]=!collapsedMonths[m];renderApp();}
 
 function setSyncing(v){const b=document.getElementById('sync-status');if(b)b.innerHTML=v?'<div class="sync-dot" style="background:var(--yellow)"></div>Sincronizando...':'<div class="sync-dot"></div>Sincronizado';}
 
@@ -432,11 +444,24 @@ function saveQuickClient(){
 
 function renderFinanceiro(){
   const el=document.getElementById('entries-table');if(!S.entries.length){el.innerHTML='<div class="empty-state">Nenhum lançamento.</div>';return;}
-  const s=[...S.entries].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  let h=`<div class="table-wrap"><table><thead><tr><th>Data</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
-  s.forEach(e=>{
-    h+=`<tr><td style="font-family:'DM Mono',monospace">${e.date&&e.date.includes('-')?e.date.split('-').reverse().join('/'):e.date}</td><td><span class="chip"><span class="chip-dot" style="background:${gc(e.clientId).color}"></span>${gc(e.clientId).name}</span></td><td>${gs(e.serviceId).name} ${e.qty>1?`<span style="color:var(--text3);font-size:11px">x${e.qty}</span>`:''} ${e.desc?`<span style="color:var(--text3)">— ${e.desc}</span>`:''}</td><td class="val-money" style="font-family:'DM Mono',monospace;font-weight:500">${fmt((e.price||0)*(e.qty||1))}</td><td><span class="badge ${e.status==='recebido'?'badge-green':'badge-yellow'}" style="cursor:pointer" onclick="toggleEntryStatus(${e.id})">${(e.status||'').toUpperCase()}</span></td><td style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-sm btn-ghost" onclick="openEntryModal(${e.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="deleteEntry(${e.id})">✕</button></td></tr>`;
-  });el.innerHTML=h+`</tbody></table></div>`;
+  const groups={};
+  [...S.entries].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach(e=>{
+    const m=(e.date||'').slice(0,7)||'Outros';if(!groups[m])groups[m]=[];groups[m].push(e);
+  });
+  const ms=Object.keys(groups).sort().reverse();
+  el.innerHTML=ms.map(m=>{
+    const isC=collapsedMonths[m]||false;
+    let label=m;if(m!=='Outros'){const [y,mn]=m.split('-');label=`${monthNamesLong[parseInt(mn)-1]} ${y}`;}
+    const ens=groups[m];const tot=ens.filter(e=>e.status==='recebido').reduce((s,e)=>s+((e.price||0)*(e.qty||1)),0);
+    return `<div class="month-group ${isC?'collapsed':''}">
+      <div class="month-header" onclick="toggleMonth('${m}')">
+        <div class="month-title"><svg class="month-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>${label}</div>
+        <div class="month-total val-money val-green">${fmt(tot)}</div>
+      </div>
+      <div class="month-content"><table><thead><tr><th>Data</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+        ${ens.map(e=>`<tr><td style="font-family:'DM Mono',monospace">${e.date&&e.date.includes('-')?e.date.split('-').reverse().join('/'):e.date}</td><td><span class="chip"><span class="chip-dot" style="background:${gc(e.clientId).color}"></span>${gc(e.clientId).name}</span></td><td>${gs(e.serviceId).name} ${e.qty>1?`<span style="color:var(--text3);font-size:11px">x${e.qty}</span>`:''} ${e.desc?`<span style="color:var(--text3)">— ${e.desc}</span>`:''}</td><td class="val-money" style="font-family:'DM Mono',monospace;font-weight:500">${fmt((e.price||0)*(e.qty||1))}</td><td><span class="badge ${e.status==='recebido'?'badge-green':'badge-yellow'}" style="cursor:pointer" onclick="toggleEntryStatus(${e.id})">${(e.status||'').toUpperCase()}</span></td><td style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-sm btn-ghost" onclick="openEntryModal(${e.id})">Editar</button><button class="btn btn-sm btn-danger" onclick="deleteEntry(${e.id})">✕</button></td></tr>`).join('')}
+      </tbody></table></div></div>`;
+  }).join('');
 }
 
 function openEntryModal(id=null,pf=null){
@@ -460,13 +485,13 @@ function openDemandModal(id=null){
   const d=id?gd(id):null;
   const co=S.clients.map(c=>`<option value="${c.id}" ${d&&d.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
   const so=COLS.map(c=>`<option value="${c.key}" ${d&&d.status===c.key?'selected':''}>${c.label}</option>`).join('');
-  showModal(`<div class="modal-header"><div class="modal-title">${d?'Editar Demanda':'Nova Demanda'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-group"><label>Título</label><input id="dm-title" value="${d?d.title:''}"></div><div class="form-row form-row-2"><div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="dm-client" style="flex:1">${co}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div><div class="form-group"><label>Status</label><select id="dm-status">${so}</select></div></div><div class="form-group"><label>Prazo</label><input type="date" id="dm-due" value="${d&&d.due?d.due:''}"></div><div class="modal-footer" style="justify-content:space-between;"><div style="display:flex;gap:8px;width:100%;justify-content:flex-start;">${d?`<button class="btn btn-danger" onclick="confirmAction('Excluir?',()=>deleteDemand(${d.id}))">Excluir</button>`:''}${d&&d.due?`<button class="btn btn-ghost" style="color:var(--blue)" onclick="exportToGoogleCalendar(${d.id})">📅 Agenda</button>`:''}</div><div style="display:flex;gap:8px;width:100%;justify-content:flex-end;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveDemand(${d?d.id:null})">Salvar</button></div></div>`);
+  showModal(`<div class="modal-header"><div class="modal-title">${d?'Editar Demanda':'Nova Demanda'}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div class="form-group"><label>Título</label><input id="dm-title" value="${d?d.title:''}"></div><div class="form-row form-row-2"><div class="form-group"><label>Cliente</label><div class="quick-add-wrap"><select id="dm-client" style="flex:1">${co}</select><button class="quick-add-btn" onclick="openQuickClientModal()">+</button></div></div><div class="form-group"><label>Status</label><select id="dm-status">${so}</select></div></div><div class="form-group"><label>Prazo</label><input type="date" id="dm-due" value="${d&&d.due?d.due:''}"></div><div class="form-group"><label>Descrição Detalhada</label><textarea id="dm-desc" rows="4" style="resize:vertical">${d&&d.desc?d.desc:''}</textarea></div><div class="modal-footer" style="justify-content:space-between;"><div style="display:flex;gap:8px;width:100%;justify-content:flex-start;">${d?`<button class="btn btn-danger" onclick="confirmAction('Excluir?',()=>deleteDemand(${d.id}))">Excluir</button>`:''}${d&&d.due?`<button class="btn btn-ghost" style="color:var(--blue)" onclick="exportToGoogleCalendar(${d.id})">📅 Agenda</button>`:''}</div><div style="display:flex;gap:8px;width:100%;justify-content:flex-end;"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-accent" onclick="saveDemand(${d?d.id:null})">Salvar</button></div></div>`);
   setTimeout(()=>document.getElementById('dm-title').focus(),100);
 }
 
 function saveDemand(id){
   const t=document.getElementById('dm-title').value.trim();if(!t)return;
-  const p={title:t,clientId:parseInt(document.getElementById('dm-client').value),status:document.getElementById('dm-status').value,due:document.getElementById('dm-due').value};
+  const p={title:t,clientId:parseInt(document.getElementById('dm-client').value),status:document.getElementById('dm-status').value,due:document.getElementById('dm-due').value,desc:document.getElementById('dm-desc').value.trim()};
   if(id)Object.assign(gd(parseInt(id)),p);else S.demands.push({id:uid(),...p});
   saveData();closeModal();renderApp();
 }
